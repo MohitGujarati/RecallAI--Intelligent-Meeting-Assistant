@@ -1,9 +1,11 @@
 package com.example.recall_ai.api
 
 import android.util.Log
+import android.widget.Toast
 import com.example.recall_ai.config.AiModelConfig
 import com.google.gson.Gson
 import com.example.recall_ai.data.remote.dto.GeminiStreamResponse
+import dagger.Provides
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -25,15 +27,16 @@ private const val TAG = "GeminiClient"
  * SSE streaming client — used exclusively by GeminiChatService.
  * Summary now uses generateContent (GeminiSummaryService) — not this class.
  */
+
 @Singleton
 class GeminiStreamingClient @Inject constructor(
     private val httpClient: OkHttpClient,
     private val gson: Gson,
-    @Named("gemini_api_key") private val apiKey: String
+
+
 ) {
-
     companion object {
-
+        @Named("gemini_api_key")  private val apiKey: String=AiModelConfig.GEMINI_API_KEY
         // Chat streaming endpoint
         // Builds to: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent
         private val BASE_URL =
@@ -44,7 +47,7 @@ class GeminiStreamingClient @Inject constructor(
 
     fun stream(requestBody: String): Flow<GeminiStreamResponse> = callbackFlow {
         val url = "$BASE_URL?alt=sse&key=$apiKey"
-
+        Log.d("GeminiStreamingClient", "Streaming to $url")
         val request = Request.Builder()
             .url(url)
             .post(requestBody.toRequestBody(JSON_MEDIA_TYPE))

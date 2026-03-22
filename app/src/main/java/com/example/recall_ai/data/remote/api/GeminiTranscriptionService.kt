@@ -26,11 +26,10 @@ private const val TAG = "GeminiTranscription"
 class GeminiTranscriptionService @Inject constructor(
     private val httpClient: OkHttpClient,
     private val gson: Gson,
-    @Named("gemini_api_key") private val apiKey: String
 ) : TranscriptionService {
 
     companion object {
-
+        @Named("gemini_api_key")  private val apiKey: String=AiModelConfig.GEMINI_API_KEY
         // Reads from AiModelConfig — change model there, not here
         val TRANSCRIPTION_MODEL = AiModelConfig.GEMINI_TRANSCRIPTION_MODEL
 

@@ -50,10 +50,10 @@ private const val TAG = "GeminiSummaryService"
 class GeminiSummaryService @Inject constructor(
     private val httpClient: OkHttpClient,
     private val gson: Gson,
-    @Named("gemini_api_key") private val apiKey: String
 ) : SummaryService {
 
     companion object {
+        @Named("gemini_api_key") private val apiKey: String= AiModelConfig.GEMINI_API_KEY
 
         private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
 

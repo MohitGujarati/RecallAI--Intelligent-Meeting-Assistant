@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,11 @@ plugins {
 
     alias(libs.plugins.kapt)
     alias(libs.plugins.hilt)
+}
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -22,13 +29,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        val geminiApiKey = project.findProperty("GEMINI_API_KEY") as String? ?: "EnterAPIKeyHere"
+// Safely extract the keys. Fallback to empty string if missing so the build doesn't crash.
+        // Safely extract the keys. Fallback to empty string if missing so the build doesn't crash.
+        val geminiKey = localProperties.getProperty("GEMINI_API_KEY") ?: ""
+        val openAiKey = localProperties.getProperty("OPENAI_API_KEY") ?: ""
 
-        buildConfigField(
-            "String",
-            "GEMINI_API_KEY",
-            "\"${project.properties["GEMINI_API_KEY"]}\""
-        )
+        // Generate the BuildConfig fields. Notice the escaped quotes "\"$variable\""
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKey\"")
+        buildConfigField("String", "OPENAI_API_KEY", "\"$openAiKey\"")
     }
 
     buildTypes {

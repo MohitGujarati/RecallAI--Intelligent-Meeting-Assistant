@@ -1,5 +1,7 @@
 package com.example.recall_ai.config
 
+import com.example.recall_ai.BuildConfig
+
 /**
  * Centralized configuration for AI Model identifiers used across the app.
  * Change these values to update the models used by the Gemini and Whisper services.
@@ -22,4 +24,9 @@ object AiModelConfig {
 
     /** Base URL for Whisper transcription endpoints */
     const val WHISPER_BASE_URL           = "https://api.openai.com/"
+
+
+     val OPENAI_API_KEY =""
+     val GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY
 }
+
