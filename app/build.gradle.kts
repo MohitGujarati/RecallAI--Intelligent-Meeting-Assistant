@@ -8,6 +8,7 @@ plugins {
 
     alias(libs.plugins.kapt)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.google.services)
 }
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
@@ -71,6 +72,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.animation.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -79,7 +81,26 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    // You already have this BoM line:
+    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
+
+    // Add this line for Authentication:
+    // 1. The BoM (Keep this)
+    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
+
+    // 2. Firebase Auth (Main module - no -ktx needed!)
+    implementation("com.google.firebase:firebase-auth")
+
+    // 3. Google Sign-In & Auth Services
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+    // 4. Coroutine support for Play Services (Keep this for .await() calls)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
+
+    // 5. OkHttp (Keep if you're making other network calls)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+
     // Jetpack Compose
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
     implementation("androidx.compose.ui:ui")

@@ -254,4 +254,8 @@ class SummaryRepository @Inject constructor(
 
     suspend fun getSummary(meetingId: Long): Summary? =
         summaryDao.getByMeetingId(meetingId)
+
+    /** Action Items screen: observe all completed summaries */
+    fun observeAllCompletedSummaries(): Flow<List<Summary>> =
+        summaryDao.observeAllCompletedSummaries()
 }

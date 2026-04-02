@@ -138,4 +138,12 @@ interface SummaryDao {
      */
     @Query("SELECT * FROM summaries WHERE status = 'GENERATING'")
     suspend fun getGeneratingSummaries(): List<Summary>
+
+    /** Fetch all completed summaries for global Live AI context */
+    @Query("SELECT * FROM summaries WHERE status = 'COMPLETED' ORDER BY updatedAt DESC")
+    suspend fun getAllCompletedSummaries(): List<Summary>
+
+    /** Observe all completed summaries reactively — used by Action Items screen */
+    @Query("SELECT * FROM summaries WHERE status = 'COMPLETED' ORDER BY updatedAt DESC")
+    fun observeAllCompletedSummaries(): Flow<List<Summary>>
 }

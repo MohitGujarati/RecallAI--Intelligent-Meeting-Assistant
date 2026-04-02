@@ -1,22 +1,77 @@
 package com.example.recall_ai.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.recall_ai.Auth.AuthViewModel
+import com.example.recall_ai.ui.dashboard.ActionItemsScreen
 import com.example.recall_ai.ui.dashboard.AllRecallsScreen
 import com.example.recall_ai.ui.dashboard.DashboardScreen
+import com.example.recall_ai.ui.liveai.LiveAiScreen
+import com.example.recall_ai.ui.login.AccountScreen
+import com.example.recall_ai.ui.login.LoginScreen
+import com.example.recall_ai.ui.login.SignupScreen
 import com.example.recall_ai.ui.meetingdetail.MeetingDetailScreen
 import com.example.recall_ai.ui.recording.RecordingScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
+
+    // ── Determine start destination based on existing Firebase session ────
+    // AuthViewModel.isSignedIn is initialised from AuthRepository.isSignedIn
+    // (synchronous FirebaseAuth.currentUser != null) so its initialValue is
+    // available immediately — no splash / loading state needed.
+    val authViewModel: AuthViewModel = hiltViewModel()
+    val isSignedIn by authViewModel.isSignedIn.collectAsStateWithLifecycle()
+
+    val startDestination = if (isSignedIn) Screen.Dashboard.route else Screen.Login.route
+
     NavHost(
         navController    = navController,
-        startDestination = Screen.Dashboard.route
+        startDestination = startDestination
     ) {
+
+        // ── Login ─────────────────────────────────────────────────────────
+        composable(Screen.Login.route) {
+            LoginScreen(
+                onLoginSuccess = {
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                },
+                onSignUpClick = { navController.navigate(Screen.SignUp.route) },
+                onGuestClick  = {
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // ── Sign Up ───────────────────────────────────────────────────────
+        composable(Screen.SignUp.route) {
+            SignupScreen(
+                onSignUpSuccess = {
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                },
+                onLoginClick = {
+                    navController.popBackStack()
+                },
+                onGuestClick = {
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
 
         composable(Screen.Dashboard.route) {
             DashboardScreen(
@@ -28,6 +83,16 @@ fun AppNavigation(navController: NavHostController) {
                 },
                 onNavigateToAllRecalls = {
                     navController.navigate(Screen.AllRecalls.route)
+                },
+                onNavigateToGlobalLiveAi = {
+                    // meetingId = 0L signals "global context" mode in LiveAiRepository
+                    navController.navigate(Screen.LiveAi(0L).route)
+                },
+                onNavigateToActionItems = {
+                    navController.navigate(Screen.ActionItems.route)
+                },
+                onNavigateToAccount = {
+                    navController.navigate(Screen.Account.route)
                 }
             )
         }
@@ -49,6 +114,13 @@ fun AppNavigation(navController: NavHostController) {
             )
         }
 
+        // ── Action Items / To-Do ──────────────────────────────────────────
+        composable(Screen.ActionItems.route) {
+            ActionItemsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
         composable(
             route     = Screen.MeetingDetail.ROUTE,
             arguments = listOf(
@@ -60,8 +132,37 @@ fun AppNavigation(navController: NavHostController) {
                 ?: return@composable
 
             MeetingDetailScreen(
+                meetingId          = meetingId,
+                onNavigateBack     = { navController.popBackStack() },
+                onNavigateToLiveAi = { id ->
+                    navController.navigate(Screen.LiveAi(id).route)
+                }
+            )
+        }
+
+        // ── Live AI ───────────────────────────────────────────────────────
+        composable(
+            route     = Screen.LiveAi.ROUTE,
+            arguments = listOf(navArgument(Screen.LiveAi.ARG) { type = NavType.LongType })
+        ) { backStackEntry ->
+            val meetingId = backStackEntry.arguments?.getLong(Screen.LiveAi.ARG)
+                ?: return@composable
+
+            LiveAiScreen(
                 meetingId      = meetingId,
                 onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // ── Account / Profile ─────────────────────────────────────────────
+        composable(Screen.Account.route) {
+            AccountScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onSignedOut = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }   // wipe the entire back stack
+                    }
+                }
             )
         }
     }

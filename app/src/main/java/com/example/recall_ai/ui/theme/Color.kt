@@ -12,6 +12,13 @@ val ColorSurfaceVariant = Color(0xFFF1F3F5)   // slightly tinted grey for chips/
 val ColorNavy           = Color(0xFF0D3E5E)   // primary accent (#0d3e5e)
 val ColorNavyLight      = Color(0x330D3E5E)   // primary/20
 val ColorNavyGradientEnd= Color(0xFFFFFFFF)   // gradient to white
+val TealLight  = ColorNavy   // Cyan / Material Teal 400
+val TealMid    = ColorNavy   // Teal 700
+val TealDark   =ColorNavy   // Teal 900
+val White      = Color(0xFFFFFFFF)   // Pure white
+val PulseRing  = Color(0xFF00BCD4)
+val IndigoFab  = Color(0xFF3D3DAA)
+val IndigoHigh = Color(0xFF5A5AEE)
 
 // ── Text ──────────────────────────────────────────────────────────────
 val ColorOnBackground   = Color(0xFF1A1A2E)   // near-black primary text

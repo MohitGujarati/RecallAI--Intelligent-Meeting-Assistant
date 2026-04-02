@@ -20,11 +20,13 @@ import com.example.recall_ai.worker.SummaryWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,58 +35,19 @@ import javax.inject.Inject
 // UI state types
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * All possible states for the Summary tab.
- *
- * This is a display-layer projection of the raw [Summary] entity +
- * [MeetingStatus]. The composable has zero when/if logic on domain
- * types — it switches only on this sealed class.
- *
- * State machine:
- *   WaitingForTranscription  meeting.status == STOPPED (chunks still processing)
- *          │
- *          ▼
- *   Pending                  summary row absent or status == PENDING
- *          │
- *          ▼
- *   Generating               status == GENERATING — token stream in-flight
- *         ╱ ╲
- *   Complete   Failed        COMPLETED or FAILED after stream ends
- *                │
- *            (retry) → Pending → Generating → Complete | Failed
- */
 sealed class SummaryUiState {
-
-    /**
-     * Meeting is still transcribing. Summary pipeline has not triggered yet.
-     *
-     * @param completedChunks  Transcript rows already written (proxy for done chunks)
-     * @param totalChunks      From Meeting.totalChunks — denominator for progress
-     */
     data class WaitingForTranscription(
         val completedChunks: Int,
         val totalChunks:     Int
     ) : SummaryUiState()
 
-    /** Summary row absent or PENDING — WorkManager not yet dispatched */
     object Pending : SummaryUiState()
 
-    /**
-     * LLM is streaming. Raw token buffer shown verbatim while sections
-     * are shimmer-skeletonised.
-     *
-     * @param streamBuffer  Accumulated raw text — grows word-by-word from Room
-     * @param retryCount    > 0 → show "Attempt N" badge so user knows it re-tried
-     */
     data class Generating(
         val streamBuffer: String,
         val retryCount:   Int = 0
     ) : SummaryUiState()
 
-    /**
-     * Four structured sections are ready to display.
-     * Every field is non-null — the ViewModel strips nulls before arriving here.
-     */
     data class Complete(
         val title:       String,
         val summary:     String,
@@ -92,13 +55,6 @@ sealed class SummaryUiState {
         val actionItems: List<String>
     ) : SummaryUiState()
 
-    /**
-     * Generation failed after exhausting retries or a permanent API error.
-     *
-     * @param message    Specific user-facing error from [GeminiSummaryService]
-     * @param retryCount How many times we've tried — shown as "Attempt N of 3"
-     * @param canRetry   False once retryCount >= MAX_RETRIES — hides the button
-     */
     data class Failed(
         val message:    String,
         val retryCount: Int,
@@ -106,13 +62,11 @@ sealed class SummaryUiState {
     ) : SummaryUiState()
 }
 
-/** State for the Transcript tab */
 data class TranscriptUiState(
     val segments:    List<Transcript> = emptyList(),
     val isComplete:  Boolean          = false
 )
 
-/** Screen-level state driving the entire MeetingDetail UI */
 data class MeetingDetailUiState(
     val meeting:    Meeting?          = null,
     val summary:    SummaryUiState    = SummaryUiState.Pending,
@@ -132,26 +86,13 @@ class MeetingDetailViewModel @Inject constructor(
     private val summaryRepository:   SummaryRepository,
     private val chatMessageDao:      ChatMessageDao,
     private val chatService:         GeminiChatService,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val voiceHelper:         VoiceHelper // FIXED: Injected VoiceHelper here
 ) : ViewModel() {
 
     val meetingId: Long =
         savedStateHandle.get<Long>(Screen.MeetingDetail.ARG) ?: -1L
 
-    /**
-     * Combined state — one snapshot covers all three Room flows.
-     *
-     * Why combine() and not three separate StateFlows?
-     * Because Room emits independently — a separate meeting observer and
-     * summary observer would briefly show mismatched states (e.g. meeting
-     * is COMPLETED but summary not yet fetched). combine() serialises the
-     * three into a single consistent update.
-     *
-     * Flow topology:
-     *   observeMeeting(id)    ─┐
-     *   observeSummary(id)    ─┼─▶ combine() ─▶ map to UiState ─▶ stateIn()
-     *   observeTranscripts(id)─┘
-     */
     val uiState: StateFlow<MeetingDetailUiState> = combine(
         recordingRepository.observeMeeting(meetingId),
         summaryRepository.observeSummary(meetingId),
@@ -171,16 +112,6 @@ class MeetingDetailViewModel @Inject constructor(
         initialValue = MeetingDetailUiState()
     )
 
-    // ── User intent ───────────────────────────────────────────────────────
-
-    /**
-     * Resets the FAILED summary row to PENDING, then cancels the stale
-     * WorkManager job and immediately re-enqueues a fresh one.
-     *
-     * Why cancel-and-reenqueue instead of just KEEP?
-     * KEEP would no-op if a job already exists in the queue waiting on
-     * backoff delay. We want the retry to start now, not after 60 s.
-     */
     fun retrySummary() {
         viewModelScope.launch {
             summaryRepository.resetForRetry(meetingId)
@@ -188,40 +119,31 @@ class MeetingDetailViewModel @Inject constructor(
         }
     }
 
-    // ── State mapping ─────────────────────────────────────────────────────
-
     private fun mapSummaryState(
         summary:         Summary?,
         meeting:         Meeting?,
         completedChunks: Int
     ): SummaryUiState {
-
-        // Meeting still transcribing — summary worker not yet triggered
         if (meeting?.status == MeetingStatus.STOPPED) {
             return SummaryUiState.WaitingForTranscription(
                 completedChunks = completedChunks,
                 totalChunks     = meeting.totalChunks
             )
         }
-
         if (summary == null) return SummaryUiState.Pending
 
         return when (summary.status) {
-
             SummaryStatus.PENDING -> SummaryUiState.Pending
-
             SummaryStatus.GENERATING -> SummaryUiState.Generating(
                 streamBuffer = summary.streamBuffer,
                 retryCount   = summary.retryCount
             )
-
             SummaryStatus.COMPLETED -> SummaryUiState.Complete(
                 title       = summary.title       ?: "Summary",
                 summary     = summary.summary     ?: "",
                 keyPoints   = splitLines(summary.keyPoints),
                 actionItems = splitLines(summary.actionItems)
             )
-
             SummaryStatus.FAILED -> SummaryUiState.Failed(
                 message    = summary.errorMessage ?: "Summary generation failed.",
                 retryCount = summary.retryCount,
@@ -230,12 +152,6 @@ class MeetingDetailViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Splits a newline-delimited string into trimmed, non-blank lines.
-     *
-     * The LLM sometimes prefixes lines with "• ", "- " or "* " even when
-     * asked not to — strip those so our custom bullet rendering isn't doubled.
-     */
     private fun splitLines(raw: String?): List<String> =
         raw.orEmpty()
             .split("\n")
@@ -244,7 +160,6 @@ class MeetingDetailViewModel @Inject constructor(
 
     // ── Chat with transcript ──────────────────────────────────────────────
 
-    /** Live chat messages from Room — persisted across screen re-entries */
     val chatMessages: StateFlow<List<ChatMessage>> = chatMessageDao
         .observeByMeetingId(meetingId)
         .stateIn(
@@ -256,6 +171,9 @@ class MeetingDetailViewModel @Inject constructor(
     private val _isAiTyping = MutableStateFlow(false)
     val isAiTyping: StateFlow<Boolean> = _isAiTyping.asStateFlow()
 
+    // FIXED: Accessing the instance property, not statically
+    val isAiSpeaking: StateFlow<Boolean> = voiceHelper.isSpeaking
+
     private val _chatError = MutableStateFlow<String?>(null)
     val chatError: StateFlow<String?> = _chatError.asStateFlow()
 
@@ -266,12 +184,10 @@ class MeetingDetailViewModel @Inject constructor(
             _isAiTyping.value = true
             _chatError.value  = null
 
-            // 1. Insert user message
             chatMessageDao.insert(
                 ChatMessage(meetingId = meetingId, isUser = true, text = question)
             )
 
-            // 2. Get transcript for context
             val transcripts = uiState.value.transcript.segments
             val transcriptText = transcripts.joinToString("\n") { it.text }
 
@@ -283,15 +199,12 @@ class MeetingDetailViewModel @Inject constructor(
                 return@launch
             }
 
-            // 3. Insert empty AI message placeholder
             val aiMsgId = chatMessageDao.insert(
                 ChatMessage(meetingId = meetingId, isUser = false, text = "")
             )
 
-            // 4. Get conversation history (exclude the empty placeholder)
             val history = chatMessages.value.filter { it.text.isNotBlank() }
 
-            // 5. Stream response tokens into the AI message row
             try {
                 chatService.askQuestion(transcriptText, history, question)
                     .collect { token ->
@@ -299,7 +212,6 @@ class MeetingDetailViewModel @Inject constructor(
                     }
             } catch (e: Exception) {
                 Log.e("MeetingDetailVM", "Chat error: ${e.message}", e)
-                // Update the AI message with error text
                 chatMessageDao.appendText(aiMsgId, "\n\n⚠️ Error: Could not get response from Gemini.")
                 _chatError.value = "Gemini didn't work — check your API key or try again"
             } finally {
@@ -308,7 +220,45 @@ class MeetingDetailViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Voice-to-Voice orchestration.
+     */
+    fun askVoiceQuestion(text: String) {
+        viewModelScope.launch {
+            // 1. Interrupt any current TTS
+            voiceHelper.stop()
+
+            // 2. Start the text-based chat pipeline
+            askQuestion(text)
+
+            // 3. Wait slightly to ensure askQuestion() has time to set _isAiTyping = true
+            delay(100)
+
+            // 4. Suspend and wait until the AI finishes typing (streaming)
+            isAiTyping.first { !it }
+
+            // 5. Fetch the last AI response directly from the StateFlow
+            val lastMessage = chatMessages.value.lastOrNull { !it.isUser }
+            val finalizedText = lastMessage?.text ?: ""
+
+            // 6. Trigger the Text-to-Speech engine if it's a valid response
+            if (finalizedText.isNotBlank() && !finalizedText.contains("⚠️ Error")) {
+                voiceHelper.speak(finalizedText)
+            }
+        }
+    }
+
+    fun stopAiSpeaking() {
+        voiceHelper.stop()
+    }
+
     fun clearChatError() {
         _chatError.value = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // FIXED: Clean up the TTS engine to prevent memory leaks when screen closes
+        voiceHelper.shutdown()
     }
 }

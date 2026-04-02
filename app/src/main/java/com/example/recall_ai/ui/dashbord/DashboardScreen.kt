@@ -1,7 +1,7 @@
 package com.example.recall_ai.ui.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
+
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -96,9 +96,55 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTapGestures
+
+import androidx.compose.foundation.layout.wrapContentHeight
+
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
+
+import androidx.compose.ui.unit.Dp
+import com.example.recall_ai.R
+import com.example.recall_ai.ui.theme.IndigoFab
+import com.example.recall_ai.ui.theme.IndigoHigh
+import com.example.recall_ai.ui.theme.PulseRing
+import com.example.recall_ai.ui.theme.TealDark
+import com.example.recall_ai.ui.theme.TealLight
+import com.example.recall_ai.ui.theme.TealMid
+
 // ── Emoji & color palette for Edit Recall dialog ──────────────────────────────
 
-private val emojiOptions = listOf("📅", "⏱", "🎙", "✏️", "👥", "💡", "🎵", "❤️", "📋", "🗂️","🎙", "✨", "⚡", "👥", "🧠", "🎯", "☕", "💬", "📌")
+private val emojiOptions = listOf(
+    "📅",
+    "⏱",
+    "🎙",
+    "✏️",
+    "👥",
+    "💡",
+    "🎵",
+    "❤️",
+    "📋",
+    "🗂️",
+    "🎙",
+    "✨",
+    "⚡",
+    "👥",
+    "🧠",
+    "🎯",
+    "☕",
+    "💬",
+    "📌"
+)
 
 private val colorOptions = listOf(
     "#FFFFFF", // white
@@ -111,7 +157,11 @@ private val colorOptions = listOf(
 
 private fun parseColor(hex: String?): Color {
     if (hex == null) return Color(0xFFE8EAF0)
-    return try { Color(android.graphics.Color.parseColor(hex)) } catch (_: Exception) { Color(0xFFE8EAF0) }
+    return try {
+        Color(android.graphics.Color.parseColor(hex))
+    } catch (_: Exception) {
+        Color(0xFFE8EAF0)
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -122,13 +172,16 @@ private fun parseColor(hex: String?): Color {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
-    onNavigateToRecording:  () -> Unit,
-    onNavigateToMeeting:    (Long) -> Unit,
+    onNavigateToRecording: () -> Unit,
+    onNavigateToMeeting: (Long) -> Unit,
     onNavigateToAllRecalls: () -> Unit,
+    onNavigateToGlobalLiveAi: () -> Unit,
+    onNavigateToActionItems: () -> Unit = {},
+    onNavigateToAccount: () -> Unit = {},
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
-    val meetings          by viewModel.meetings.collectAsStateWithLifecycle()
-    val recordingState    by viewModel.recordingState.collectAsStateWithLifecycle()
+    val meetings by viewModel.meetings.collectAsStateWithLifecycle()
+    val recordingState by viewModel.recordingState.collectAsStateWithLifecycle()
     val isActiveRecording by viewModel.isRecordingActive.collectAsStateWithLifecycle()
 
     // Edit dialog state
@@ -136,7 +189,7 @@ fun DashboardScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color    = ColorBackground
+        color = ColorBackground
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
@@ -145,17 +198,17 @@ fun DashboardScreen(
                     .fillMaxSize()
                     .statusBarsPadding()
             ) {
-                DashboardAppBar()
+                DashboardAppBar(onProfileClick = onNavigateToAccount)
 
                 LazyColumn(
-                    modifier          = Modifier.weight(1f),
-                    contentPadding    = PaddingValues(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(
                         start = 20.dp, end = 20.dp, top = 16.dp, bottom = 100.dp
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     item { DashboardGreeting() }
-                    item { FeatureCards() }
+                    item { FeatureCards(onToDoClick = onNavigateToActionItems) }
 
                     if (meetings.isEmpty()) {
                         item { EmptyState(modifier = Modifier.padding(top = 48.dp)) }
@@ -163,21 +216,21 @@ fun DashboardScreen(
                         // Section header
                         item {
                             Row(
-                                modifier              = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment     = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text  = "Recent Recalls",
+                                    text = "Recent Recalls",
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Bold, fontSize = 16.sp
                                     ),
                                     color = ColorOnBackground
                                 )
                                 Text(
-                                    text     = "View All",
-                                    style    = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
-                                    color    = ColorNavy,
+                                    text = "View All",
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
+                                    color = ColorNavy,
                                     modifier = Modifier.clickable { onNavigateToAllRecalls() }
                                 )
                             }
@@ -186,7 +239,7 @@ fun DashboardScreen(
                         // Show latest 3 with swipe-to-delete
                         itemsIndexed(
                             items = meetings.take(3),
-                            key   = { _, m -> m.id }
+                            key = { _, m -> m.id }
                         ) { index, meeting ->
                             val dismissState = rememberSwipeToDismissBoxState(
                                 confirmValueChange = { value ->
@@ -199,11 +252,11 @@ fun DashboardScreen(
 
                             AnimatedVisibility(
                                 visible = dismissState.currentValue != SwipeToDismissBoxValue.EndToStart,
-                                enter   = fadeIn(tween(200)) + slideInVertically(tween(200 + index * 30)),
-                                exit    = fadeOut(tween(150))
+                                enter = fadeIn(tween(200)) + slideInVertically(tween(200 + index * 30)),
+                                exit = fadeOut(tween(150))
                             ) {
                                 SwipeToDismissBox(
-                                    state                       = dismissState,
+                                    state = dismissState,
                                     enableDismissFromStartToEnd = false,
                                     enableDismissFromEndToStart = true,
                                     backgroundContent = { SwipeDeleteBackground(progress = dismissState.progress) },
@@ -221,24 +274,25 @@ fun DashboardScreen(
                 }
             }
 
-            // FAB
-            CaptureNotesFab(
-                isActive = isActiveRecording,
-                onClick  = { onNavigateToRecording() },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(bottom = 20.dp)
-            )
+
         }
+        // ─── Bottom FAB Bar ───────────────────────────────────────────────────────────
+        BottomFabBar(
+            isActiveRecording = isActiveRecording,
+            onNavigateToRecording = onNavigateToRecording,
+            onNavigateToGlobalLiveAi = onNavigateToGlobalLiveAi,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(Alignment.Bottom),
+        )
     }
 
     // ── Edit Recall Bottom Sheet ──────────────────────────────────────────
     editMeeting?.let { meeting ->
         EditRecallSheet(
-            meeting   = meeting,
+            meeting = meeting,
             onDismiss = { editMeeting = null },
-            onSave    = { title, emoji, color ->
+            onSave = { title, emoji, color ->
                 viewModel.updateMeetingDetails(meeting.id, title, emoji, color)
                 editMeeting = null
             }
@@ -253,20 +307,20 @@ fun DashboardScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditRecallSheet(
-    meeting:   Meeting,
+    meeting: Meeting,
     onDismiss: () -> Unit,
-    onSave:    (title: String, emoji: String?, color: String?) -> Unit
+    onSave: (title: String, emoji: String?, color: String?) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var name  by remember { mutableStateOf(meeting.title) }
+    var name by remember { mutableStateOf(meeting.title) }
     var emoji by remember { mutableStateOf(meeting.iconEmoji) }
     var color by remember { mutableStateOf(meeting.iconColorHex) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState       = sheetState,
-        containerColor   = ColorSurface,
-        shape            = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        sheetState = sheetState,
+        containerColor = ColorSurface,
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     ) {
         Column(
             modifier = Modifier
@@ -275,13 +329,13 @@ private fun EditRecallSheet(
                 .padding(bottom = 24.dp)
         ) {
             Text(
-                text  = "Edit Recall",
+                text = "Edit Recall",
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 color = ColorOnBackground
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text  = "Update your meeting details and icon",
+                text = "Update your meeting details and icon",
                 style = MaterialTheme.typography.bodySmall,
                 color = ColorOnSurfaceDim
             )
@@ -290,19 +344,19 @@ private fun EditRecallSheet(
 
             // Meeting Name
             Text(
-                text  = "Meeting Name",
+                text = "Meeting Name",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = ColorOnBackground
             )
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
-                value         = name,
+                value = name,
                 onValueChange = { name = it },
-                modifier      = Modifier.fillMaxWidth(),
-                singleLine    = true,
-                shape         = RoundedCornerShape(10.dp),
-                colors        = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor   = ColorNavy,
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(10.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = ColorNavy,
                     unfocusedBorderColor = ColorBorder
                 )
             )
@@ -311,7 +365,7 @@ private fun EditRecallSheet(
 
             // Select Icon (emoji)
             Text(
-                text  = "Select Icon",
+                text = "Select Icon",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = ColorOnBackground
             )
@@ -343,7 +397,7 @@ private fun EditRecallSheet(
 
             // Icon Background Color
             Text(
-                text  = "Icon Background Color",
+                text = "Icon Background Color",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = ColorOnBackground
             )
@@ -373,7 +427,7 @@ private fun EditRecallSheet(
 
             // Buttons
             Row(
-                modifier              = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Cancel
@@ -387,7 +441,7 @@ private fun EditRecallSheet(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text  = "Cancel",
+                        text = "Cancel",
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
                         color = ColorOnBackground
                     )
@@ -403,7 +457,7 @@ private fun EditRecallSheet(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text  = "Save Changes",
+                        text = "Save Changes",
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
                         color = Color.White
                     )
@@ -418,20 +472,20 @@ private fun EditRecallSheet(
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @Composable
-private fun DashboardAppBar() {
+private fun DashboardAppBar(onProfileClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment     = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = { }, modifier = Modifier.size(40.dp)) {
-            Icon(Icons.Default.Menu, contentDescription = "Menu", tint = ColorNavy)
+      //      Icon(Icons.Default.Menu, contentDescription = "Menu", tint = ColorNavy)
         }
         Text(
-            text  = "RECALL",
-            style = MaterialTheme.typography.titleMedium.copy(
+            text = "RECALL",
+            style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold, letterSpacing = 2.sp
             ),
             color = ColorNavy
@@ -441,10 +495,16 @@ private fun DashboardAppBar() {
                 .size(36.dp)
                 .clip(CircleShape)
                 .background(ColorNavy.copy(alpha = 0.15f))
-                .border(1.5.dp, ColorNavy.copy(alpha = 0.1f), CircleShape),
+                .border(1.5.dp, ColorNavy.copy(alpha = 0.1f), CircleShape)
+                .clickable(onClick = onProfileClick),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Person, contentDescription = "Profile", tint = ColorNavy, modifier = Modifier.size(18.dp))
+            Icon(
+                Icons.Default.Person,
+                contentDescription = "Profile",
+                tint = ColorNavy,
+                modifier = Modifier.size(18.dp)
+            )
         }
     }
 }
@@ -455,15 +515,17 @@ private fun DashboardAppBar() {
 
 @Composable
 private fun DashboardGreeting() {
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp)) {
         Text(
-            text  = "Hi, Mohit",
+            text = "Helloooo  !!",
             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
             color = ColorOnBackground
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text  = "Ready to capture a new thought?",
+            text = "Ready to capture a new thought?",
             style = MaterialTheme.typography.bodyMedium,
             color = ColorOnSurfaceDim
         )
@@ -475,34 +537,93 @@ private fun DashboardGreeting() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @Composable
-private fun FeatureCards() {
+private fun FeatureCards(onToDoClick: () -> Unit = {}) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        FeatureCard("To-Do", "12 active tasks today", Icons.Default.TaskAlt, ColorNavy)
-        FeatureCard("Memories", "Browse notes & chats", Icons.Default.Folder, ColorNavy)
+        // Pass ColorNavy to tint the vector icon
+        FeatureCard(
+            title = "To-Do",
+            subtitle = "View all action items", // Removed the \n
+            icon = rememberVectorPainter(image = Icons.Default.TaskAlt),
+            iconTint = ColorNavy,
+            onClick = onToDoClick
+        )
+
+        // Pass 'null' for the tint so SuperBOB stays full-color!
+        /*
+        FeatureCard(
+            title = "SuperBOB",
+            subtitle = "Your mini assistant who can help you with tasks and chats, schedule, reminders and more", // Removed the \n
+            icon = painterResource(id = R.drawable.ic_app_icon),
+            iconTint = null
+        )
+         */
+
     }
 }
 
 @Composable
-private fun FeatureCard(title: String, subtitle: String, icon: ImageVector, iconTint: Color) {
+private fun FeatureCard(
+    title: String,
+    subtitle: String,
+    icon: Painter,
+    iconTint: Color?, // Changed to nullable
+    onClick: () -> Unit = {}
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(ColorSurface)
             .border(1.dp, ColorBorder, RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
             .padding(20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment     = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
-            Text(text = title, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = ColorTextSlate900)
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = ColorTextSlate400)
+        // Added weight(1f) so long text wraps instead of pushing the icon off-screen
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = ColorTextSlate900
+            )
+            Spacer(modifier = Modifier.height(4.dp)) // Let Compose handle the spacing instead of \n
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = ColorTextSlate400
+            )
         }
-        Icon(icon, contentDescription = title, tint = iconTint.copy(alpha = 0.7f), modifier = Modifier.size(28.dp))
+
+        Spacer(modifier = Modifier.width(16.dp)) // Add breathing room between text and icon
+
+        // Conditionally render an Icon or an Image
+        if (iconTint != null) {
+            Icon(
+                painter = icon,
+                contentDescription = title,
+                tint = iconTint.copy(alpha = 0.7f),
+                modifier = Modifier.size(28.dp)
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .background(Color(0xFFE0DFE4), shape = CircleShape)
+                    .clip(CircleShape), // Optional, ensures no visual spillover
+                contentAlignment = Alignment.Center // Centers the mascot inside the circle
+            ) {
+                Image(
+                    painter = icon, // The SuperBOB graphic (must have a transparent background)
+                    contentDescription = title,
+                    modifier = Modifier
+                        .size(36.dp) // Maintain the mascot's unique look without cramping it
+                        .padding(2.dp) // Ensures internal spacing
+                )
+            }
+        }
     }
 }
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // MEETING ROW — emoji icon + title + meta + 3-dot menu
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -510,8 +631,8 @@ private fun FeatureCard(title: String, subtitle: String, icon: ImageVector, icon
 
 @Composable
 fun MeetingRow(
-    meeting:     Meeting,
-    onClick:     () -> Unit,
+    meeting: Meeting,
+    onClick: () -> Unit,
     onEditClick: () -> Unit = {}
 ) {
     val (defaultEmoji, defaultBg) = defaultMeetingStyle(meeting.id)
@@ -542,34 +663,55 @@ fun MeetingRow(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text     = meeting.title,
-                style    = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                color    = ColorTextSlate900,
+                text = meeting.title,
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                color = ColorTextSlate900,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(2.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(formatDate(meeting.startTime), style = MaterialTheme.typography.labelSmall, color = ColorTextSlate400)
+                Text(
+                    formatDate(meeting.startTime),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = ColorTextSlate400
+                )
                 if (meeting.durationSeconds > 0) {
-                    Text("•", style = MaterialTheme.typography.labelSmall, color = ColorTextSlate400)
-                    Text(formatDuration(meeting.durationSeconds), style = MaterialTheme.typography.labelSmall, color = ColorTextSlate400)
+                    Text(
+                        "•",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = ColorTextSlate400
+                    )
+                    Text(
+                        formatDuration(meeting.durationSeconds),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = ColorTextSlate400
+                    )
                 }
                 Text("•", style = MaterialTheme.typography.labelSmall, color = ColorTextSlate400)
-                Text("Audio", style = MaterialTheme.typography.labelSmall, color = ColorTextSlate400)
+                Text(
+                    "Audio",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = ColorTextSlate400
+                )
             }
         }
 
         IconButton(onClick = onEditClick) {
-            Icon(Icons.Default.MoreVert, contentDescription = "Edit", tint = ColorTextSlate400, modifier = Modifier.size(18.dp))
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = "Edit",
+                tint = ColorTextSlate400,
+                modifier = Modifier.size(18.dp)
+            )
         }
     }
 }
 
 private fun defaultMeetingStyle(meetingId: Long): Pair<String, String> {
     return when ((meetingId % 3).toInt()) {
-        0    -> "🎙" to "#D6EAF8"
-        1    -> "📝" to "#D5F5E3"
+        0 -> "🎙" to "#D6EAF8"
+        1 -> "📝" to "#D5F5E3"
         else -> "💬" to "#E8D5F5"
     }
 }
@@ -592,12 +734,12 @@ private fun SwipeDeleteBackground(progress: Float) {
             Icon(
                 Icons.Default.Delete,
                 contentDescription = "Delete",
-                tint     = Color.White,
+                tint = Color.White,
                 modifier = Modifier.size(22.dp)
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text  = "DELETE",
+                text = "DELETE",
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold, fontSize = 9.sp
                 ),
@@ -612,15 +754,22 @@ private fun SwipeDeleteBackground(progress: Float) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @Composable
-private fun PulseDot(color: Color, size: androidx.compose.ui.unit.Dp) {
+private fun PulseDot(color: Color, size: Dp) {
     val infiniteTransition = rememberInfiniteTransition(label = "dot")
     val alpha by infiniteTransition.animateFloat(
-        initialValue  = 0.4f,
-        targetValue   = 1f,
-        animationSpec = infiniteRepeatable(tween(700, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label         = "dotAlpha"
+        initialValue = 0.4f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            tween(700, easing = FastOutSlowInEasing),
+            RepeatMode.Reverse
+        ),
+        label = "dotAlpha"
     )
-    Box(modifier = Modifier.size(size).clip(CircleShape).alpha(alpha).background(color))
+    Box(modifier = Modifier
+        .size(size)
+        .clip(CircleShape)
+        .alpha(alpha)
+        .background(color))
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -630,20 +779,38 @@ private fun PulseDot(color: Color, size: androidx.compose.ui.unit.Dp) {
 @Composable
 private fun EmptyState(modifier: Modifier = Modifier) {
     Column(
-        modifier            = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Box(
-            modifier = Modifier.size(56.dp).clip(CircleShape).background(ColorNavy.copy(alpha = 0.08f)),
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(ColorNavy.copy(alpha = 0.08f)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Mic, contentDescription = null, tint = ColorNavy, modifier = Modifier.size(24.dp))
+            Icon(
+                Icons.Default.Mic,
+                contentDescription = null,
+                tint = ColorNavy,
+                modifier = Modifier.size(24.dp)
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text("No recordings yet", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold), color = ColorOnBackground, textAlign = TextAlign.Center)
+        Text(
+            "No recordings yet",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+            color = ColorOnBackground,
+            textAlign = TextAlign.Center
+        )
         Spacer(modifier = Modifier.height(6.dp))
-        Text("Tap Capture Note below\nto start your first session", style = MaterialTheme.typography.bodyMedium, color = ColorOnSurfaceDim, textAlign = TextAlign.Center)
+        Text(
+            "Tap Capture Note below\nto start your first session",
+            style = MaterialTheme.typography.bodyMedium,
+            color = ColorOnSurfaceDim,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -652,29 +819,206 @@ private fun EmptyState(modifier: Modifier = Modifier) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @Composable
-private fun CaptureNotesFab(isActive: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Box(
+fun BottomFabBar(
+    isActiveRecording: Boolean,
+    onNavigateToRecording: () -> Unit,
+    onNavigateToGlobalLiveAi: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
         modifier = modifier
-            .shadow(8.dp, RoundedCornerShape(50), ambientColor = ColorNavy.copy(alpha = 0.3f))
-            .clip(RoundedCornerShape(50))
-            .background(if (isActive) ColorRecordRed else ColorNavy)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 28.dp, vertical = 14.dp),
-        contentAlignment = Alignment.Center
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(horizontal = 20.dp, vertical = 20.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            if (isActive) {
-                PulseDot(Color.White, 8.dp)
-                Spacer(Modifier.width(10.dp))
-                Text("Recording in progress…", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold), color = Color.White)
-            } else {
-                Icon(Icons.Default.Mic, null, tint = Color.White, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(10.dp))
-                Text("CAPTURE NOTE", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp), color = Color.White)
+
+        AskBobFab(
+            onClick = onNavigateToGlobalLiveAi,
+            modifier = Modifier.weight(0.32f),
+        )
+
+        CaptureNotesFab(
+            isActive = isActiveRecording,
+            onClick = onNavigateToRecording,
+            modifier = Modifier.weight(0.68f),
+        )
+
+    }
+}
+
+@Composable
+fun CaptureNotesFab(
+    isActive: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    // Pulse animation when recording
+    val pulseAnim = rememberInfiniteTransition(label = "pulse")
+    val pulseScale by pulseAnim.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.18f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(900, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "pulseScale",
+    )
+    val pulseAlpha by pulseAnim.animateFloat(
+        initialValue = 0.55f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(900, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "pulseAlpha",
+    )
+
+    // Press spring
+    var pressed by remember { mutableStateOf(false) }
+    val pressScale by animateFloatAsState(
+        targetValue = if (pressed) 0.95f else 1f,
+        animationSpec = spring(dampingRatio = 0.4f, stiffness = Spring.StiffnessMediumLow),
+        label = "pressScale",
+    )
+
+    Box(
+        modifier = modifier.height(56.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        // Outer glow / pulse ring (only when recording)
+        if (isActive) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .scale(pulseScale)
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(PulseRing.copy(alpha = pulseAlpha)),
+            )
+        }
+
+        // Main pill button
+        Surface(
+            modifier = Modifier
+                .matchParentSize()
+                .scale(pressScale)
+                .shadow(
+                    elevation = if (isActive) 18.dp else 8.dp,
+                    shape = RoundedCornerShape(28.dp),
+                    ambientColor = TealLight.copy(alpha = 0.6f),
+                    spotColor = TealLight.copy(alpha = 0.6f),
+                )
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                            pressed = true
+                            tryAwaitRelease()
+                            pressed = false
+                        },
+                        onTap = { onClick() },
+                    )
+                },
+            shape = RoundedCornerShape(28.dp),
+            color = Color.Transparent,
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.linearGradient(
+                            colors = if (isActive)
+                                listOf(TealLight, TealMid)
+                            else
+                                listOf(TealMid, TealDark),
+                        )
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    // Mic icon — swap for your actual resource
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.Mic, // Or Icons.Rounded.Mic
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = if (isActive) "RECORDING…" else "CAPTURE NOTE",
+                        color = if (isActive) Color.White else White,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = 1.2.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
     }
 }
+
+// ─── Ask Bob FAB ──────────────────────────────────────────────
+@Composable
+fun AskBobFab(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+
+    var pressed by remember { mutableStateOf(false) }
+    val pressScale by animateFloatAsState(
+        targetValue = if (pressed) 0.92f else 1f,
+        animationSpec = spring(dampingRatio = 0.35f, stiffness = Spring.StiffnessMediumLow),
+        label = "bobPressScale",
+    )
+
+    Box(
+        modifier = modifier
+            .height(56.dp)          // ✅ Fixed: height instead of aspectRatio
+            .scale(pressScale)
+            .shadow(
+                elevation = 10.dp,
+                shape = CircleShape,
+                ambientColor = IndigoHigh.copy(alpha = 0.4f),
+                spotColor = IndigoHigh.copy(alpha = 0.6f),
+            )
+            .clip(CircleShape)
+            .background(
+                Brush.radialGradient(
+                    colors = listOf(IndigoHigh, IndigoFab),
+                )
+            )
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        pressed = true
+                        tryAwaitRelease()
+                        pressed = false
+                    },
+                    onTap = { onClick() },
+                )
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                "ASK BOB",
+                color = White,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
+        }
+    }
+}
+
+// ─── Sparkle Ring ─────────────────────────────────────────────
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // HELPERS
@@ -689,6 +1033,6 @@ internal fun formatDuration(seconds: Long): String {
     val m = TimeUnit.SECONDS.toMinutes(seconds) % 60
     val s = seconds % 60
     return if (h > 0) "%dh %02dm".format(h, m)
-    else if (m > 0)   "%02d mins".format(m)
-    else              "${s}s"
+    else if (m > 0) "%02d mins".format(m)
+    else "${s}s"
 }

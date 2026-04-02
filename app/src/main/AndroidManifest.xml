@@ -59,6 +59,12 @@
             android:exported="false"
             android:foregroundServiceType="microphone" />
 
+        <!-- ── Live AI foreground service ─────────────────────────── -->
+        <service
+            android:name=".service.LiveAiService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"

@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.work.Configuration
 import com.example.recall_ai.service.recovery.ProcessDeathRecoveryManager
+import com.google.firebase.FirebaseApp
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,9 +51,12 @@ class RecallApplication : Application(), Configuration.Provider {
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     override fun onCreate() {
+        FirebaseApp.initializeApp(this)
         super.onCreate()
         Log.d(TAG, "Application created")
         runProcessDeathRecovery()
+
+
     }
 
     /**
