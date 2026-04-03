@@ -157,6 +157,17 @@ class RecordingViewModel @Inject constructor(
 
     fun startRecording() = repository.startRecording(_transcriptionMode.value)
     fun stopRecording()  = repository.stopRecording()
+    fun pauseRecording() = repository.pauseRecording()
+    fun resumeRecording() = repository.resumeRecording()
+
+    fun togglePauseResume() {
+        val current = uiState.value
+        if (current is RecordingUiState.Active && current.isPaused) {
+            resumeRecording()
+        } else {
+            pauseRecording()
+        }
+    }
 
     // ── State mapping ─────────────────────────────────────────────────────
 

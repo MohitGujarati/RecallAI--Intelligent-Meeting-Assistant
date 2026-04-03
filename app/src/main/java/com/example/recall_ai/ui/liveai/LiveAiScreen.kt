@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -115,6 +116,8 @@ fun LiveAiScreen(
             }
 
             // --- BOTTOM CONTROLS ---
+            val isSpeaking = uiState is LiveAiState.Speaking
+
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -123,19 +126,19 @@ fun LiveAiScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Hold/Pause Button (Light variant)
+                // Interrupt / Hold Button — stops AI speech and switches to listening
                 ControlButton(
-                    icon = Icons.Rounded.Pause,
-                    label = "Hold",
-                    backgroundColor = ButtonLightSurface,
-                    iconColor = TextPrimary,
+                    icon = if (isSpeaking) Icons.Rounded.Mic else Icons.Rounded.Pause,
+                    label = if (isSpeaking) "Interrupt" else "Hold",
+                    backgroundColor = if (isSpeaking) Color(0xFF1A73E8) else ButtonLightSurface,
+                    iconColor = if (isSpeaking) Color.White else TextPrimary,
                     hasShadow = true,
-                    onClick = { /* TODO: Implement Hold/Pause */ }
+                    onClick = { viewModel.interruptAi() }
                 )
 
                 Spacer(modifier = Modifier.width(40.dp))
 
-                // End Button (Vibrant Red variant)
+                // End Button
                 ControlButton(
                     icon = Icons.Rounded.Close,
                     label = "End",

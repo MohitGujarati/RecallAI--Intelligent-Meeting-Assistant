@@ -16,7 +16,6 @@ import com.example.recall_ai.ui.dashboard.DashboardScreen
 import com.example.recall_ai.ui.liveai.LiveAiScreen
 import com.example.recall_ai.ui.login.AccountScreen
 import com.example.recall_ai.ui.login.LoginScreen
-import com.example.recall_ai.ui.login.SignupScreen
 import com.example.recall_ai.ui.meetingdetail.MeetingDetailScreen
 import com.example.recall_ai.ui.recording.RecordingScreen
 
@@ -37,33 +36,13 @@ fun AppNavigation(navController: NavHostController) {
         startDestination = startDestination
     ) {
 
-        // ── Login ─────────────────────────────────────────────────────────
+        // ── Login (Google-only + Guest) ──────────────────────────────────
         composable(Screen.Login.route) {
             LoginScreen(
                 onLoginSuccess = {
                     navController.navigate(Screen.Dashboard.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
-                },
-                onSignUpClick = { navController.navigate(Screen.SignUp.route) },
-                onGuestClick  = {
-                    navController.navigate(Screen.Dashboard.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        // ── Sign Up ───────────────────────────────────────────────────────
-        composable(Screen.SignUp.route) {
-            SignupScreen(
-                onSignUpSuccess = {
-                    navController.navigate(Screen.Dashboard.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                },
-                onLoginClick = {
-                    navController.popBackStack()
                 },
                 onGuestClick = {
                     navController.navigate(Screen.Dashboard.route) {

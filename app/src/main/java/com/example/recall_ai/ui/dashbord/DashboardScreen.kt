@@ -102,8 +102,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.defaultMinSize
 
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color.Companion.White
@@ -836,13 +838,13 @@ fun BottomFabBar(
 
         AskBobFab(
             onClick = onNavigateToGlobalLiveAi,
-            modifier = Modifier.weight(0.32f),
+            modifier = Modifier.weight(0.62f),
         )
 
         CaptureNotesFab(
             isActive = isActiveRecording,
             onClick = onNavigateToRecording,
-            modifier = Modifier.weight(0.68f),
+            modifier = Modifier.weight(0.58f),
         )
 
     }
@@ -967,27 +969,31 @@ fun AskBobFab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     var pressed by remember { mutableStateOf(false) }
+    
     val pressScale by animateFloatAsState(
         targetValue = if (pressed) 0.92f else 1f,
         animationSpec = spring(dampingRatio = 0.35f, stiffness = Spring.StiffnessMediumLow),
         label = "bobPressScale",
     )
 
+    val shadowElevation = if (pressed) 4.dp else 10.dp
+
     Box(
         modifier = modifier
-            .height(56.dp)          // ✅ Fixed: height instead of aspectRatio
+            .height(56.dp)
+            .wrapContentWidth()
+            .defaultMinSize(minWidth = 140.dp)
             .scale(pressScale)
             .shadow(
-                elevation = 10.dp,
-                shape = CircleShape,
+                elevation = shadowElevation,
+                shape = RoundedCornerShape(28.dp),
                 ambientColor = IndigoHigh.copy(alpha = 0.4f),
                 spotColor = IndigoHigh.copy(alpha = 0.6f),
             )
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(28.dp))
             .background(
-                Brush.radialGradient(
+                Brush.linearGradient(
                     colors = listOf(IndigoHigh, IndigoFab),
                 )
             )
@@ -1000,19 +1006,32 @@ fun AskBobFab(
                     },
                     onTap = { onClick() },
                 )
-            },
+            }
+            .padding(horizontal = 20.dp), 
         contentAlignment = Alignment.Center,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_bob_icon),
+                contentDescription = "Ask Bob Icon",
+                tint = Color.Unspecified, 
+                modifier = Modifier.size(58.dp) // Slightly scaled down to fit nicely
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
             Text(
-                "ASK BOB",
-                color = White,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.sp
+                text = "ASK BOB",
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = 1.sp,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Visible
             )
         }
     }
@@ -1036,3 +1055,5 @@ internal fun formatDuration(seconds: Long): String {
     else if (m > 0) "%02d mins".format(m)
     else "${s}s"
 }
+
+

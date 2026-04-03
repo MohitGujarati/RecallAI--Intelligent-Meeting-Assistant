@@ -44,6 +44,7 @@ class LiveAiService : Service() {
     companion object {
         const val ACTION_START = "ACTION_START"
         const val ACTION_STOP = "ACTION_STOP"
+        const val ACTION_INTERRUPT = "ACTION_INTERRUPT"
         const val EXTRA_MEETING_ID = "EXTRA_MEETING_ID"
 
         fun startIntent(context: Context, meetingId: Long): Intent {
@@ -56,6 +57,12 @@ class LiveAiService : Service() {
         fun stopIntent(context: Context): Intent {
             return Intent(context, LiveAiService::class.java).apply {
                 action = ACTION_STOP
+            }
+        }
+
+        fun interruptIntent(context: Context): Intent {
+            return Intent(context, LiveAiService::class.java).apply {
+                action = ACTION_INTERRUPT
             }
         }
     }
@@ -72,6 +79,7 @@ class LiveAiService : Service() {
                 else Log.e(TAG, "Missing EXTRA_MEETING_ID — cannot start")
             }
             ACTION_STOP -> handleStop()
+            ACTION_INTERRUPT -> repository.interruptAi()
             else -> Log.w(TAG, "Unknown action: ${intent?.action}")
         }
         return START_STICKY

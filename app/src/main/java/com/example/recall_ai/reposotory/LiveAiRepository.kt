@@ -131,6 +131,18 @@ class LiveAiRepository @Inject constructor(
         }
     }
 
+    /**
+     * Interrupts the AI mid-speech: stops audio playback, unmutes the mic,
+     * and transitions to Listening so the user can speak immediately.
+     */
+    fun interruptAi() {
+        val meetingId = stateHolder.currentMeetingId ?: return
+        Log.i(TAG, "interruptAi() — stopping AI speech, switching to Listening")
+        isSpeaking = false
+        audioTrackManager.flush()
+        stateHolder.emit(LiveAiState.Listening(meetingId))
+    }
+
     fun stopSession() {
         val meetingId = stateHolder.currentMeetingId ?: -1L
         Log.i(TAG, "stopSession() meetingId=$meetingId")

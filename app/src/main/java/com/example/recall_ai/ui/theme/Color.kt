@@ -17,8 +17,8 @@ val TealMid    = ColorNavy   // Teal 700
 val TealDark   =ColorNavy   // Teal 900
 val White      = Color(0xFFFFFFFF)   // Pure white
 val PulseRing  = Color(0xFF00BCD4)
-val IndigoFab  = Color(0xFF3D3DAA)
-val IndigoHigh = Color(0xFF5A5AEE)
+val IndigoFab  = Color(0x562196F3)
+val IndigoHigh = Color(0xFFC4C4F5)
 
 // ── Text ──────────────────────────────────────────────────────────────
 val ColorOnBackground   = Color(0xFF1A1A2E)   // near-black primary text

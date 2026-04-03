@@ -9,11 +9,8 @@ package com.example.recall_ai.ui.navigation
  */
 sealed class Screen(val route: String) {
 
-    /** Login screen — entry point of the app */
+    /** Login screen — entry point of the app (Google-only) */
     object Login : Screen("login")
-
-    /** Sign up screen — entry point of the app */
-    object SignUp : Screen("signup")
 
     /** Account info + sign-out */
     object Account : Screen("account")

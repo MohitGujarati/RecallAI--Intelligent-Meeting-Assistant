@@ -45,4 +45,13 @@ class LiveAiViewModel @Inject constructor(
         val intent = LiveAiService.stopIntent(application)
         application.startService(intent)
     }
+
+    /**
+     * Interrupts the AI mid-speech: stops audio output and switches to listening.
+     */
+    fun interruptAi() {
+        Log.i(TAG, "interruptAi()")
+        val intent = LiveAiService.interruptIntent(application)
+        application.startService(intent)
+    }
 }

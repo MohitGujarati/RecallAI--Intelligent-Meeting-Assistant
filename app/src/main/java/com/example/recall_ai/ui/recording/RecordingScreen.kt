@@ -68,6 +68,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.recall_ai.model.TranscriptionMode
 import com.example.recall_ai.ui.theme.ColorBackground
 import com.example.recall_ai.ui.theme.ColorBorder
+import com.example.recall_ai.ui.theme.ColorDone
 import com.example.recall_ai.ui.theme.ColorNavy
 import com.example.recall_ai.ui.theme.ColorOnBackground
 import com.example.recall_ai.ui.theme.ColorOnSurfaceDim
@@ -266,16 +267,45 @@ fun RecordingScreen(
                 TimerBox(value = seconds, label = "SECONDS")
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // Paused / Recording status label
+            if (isActive) {
+                Spacer(modifier = Modifier.height(12.dp))
+                val statusText = if (activeState?.isPaused == true) "PAUSED" else "RECORDING"
+                val statusColor = if (activeState?.isPaused == true) ColorWarning else ColorDone
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(statusColor)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = statusText,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 1.5.sp,
+                            fontSize = 11.sp
+                        ),
+                        color = statusColor
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+            } else {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
             // ═══════════════════════════════════════════════════════════════
-            // 4. CONTROLS — Play | Pause | Stop
+            // 4. CONTROLS — Pause | Stop
             // ═══════════════════════════════════════════════════════════════
             RecordingControls(
                 isActive   = isActive,
                 isPaused   = activeState?.isPaused == true,
                 onRecord   = { requestPermissionsAndRecord() },
-                onPause    = { /* TODO: pause */ },
+                onPause    = { viewModel.togglePauseResume() },
                 onStop     = { viewModel.stopRecording() }
             )
 
@@ -384,7 +414,7 @@ private fun TimerBox(value: String, label: String) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CONTROLS — Idle: Record button / Active: Pause (center) + Stop (right)
+// CONTROLS — Idle: Record button / Active: Pause + Stop in a pill bar
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @Composable
@@ -418,26 +448,24 @@ private fun RecordingControls(
             )
         }
     } else {
-        // ── Active — center pause (primary), side stop (secondary) ───
-        // Fitts's Law: biggest target in center for the most-used action
+        // ── Active — Pause + Stop side by side in a rounded pill bar ─
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 56.dp),
-            horizontalArrangement = Arrangement.Center,
+                .clip(RoundedCornerShape(40.dp))
+                .background(ColorSurfaceVariant)
+                .border(1.dp, ColorBorder, RoundedCornerShape(40.dp))
+                .padding(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment     = Alignment.CenterVertically
         ) {
-            // Spacer to balance the row
-            Spacer(modifier = Modifier.weight(1f))
-
-            // ── PAUSE / RESUME — primary action, center, large ───────
+            // ── PAUSE / RESUME ───────────────────────────────────────
             Box(
                 modifier = Modifier
-                    .size(72.dp)
+                    .size(64.dp)
                     .shadow(
-                        elevation    = 16.dp,
+                        elevation    = 8.dp,
                         shape        = CircleShape,
-                        ambientColor = ColorNavy.copy(alpha = 0.3f)
+                        ambientColor = ColorNavy.copy(alpha = 0.2f)
                     )
                     .clip(CircleShape)
                     .background(ColorNavy)
@@ -448,32 +476,24 @@ private fun RecordingControls(
                     imageVector = if (isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
                     contentDescription = if (isPaused) "Resume" else "Pause",
                     tint     = Color.White,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(28.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            // ── STOP — secondary action, smaller, right side ─────────
+            // ── STOP ─────────────────────────────────────────────────
             Box(
                 modifier = Modifier
-                    .size(56.dp)
-                    .shadow(
-                        elevation    = 4.dp,
-                        shape        = CircleShape,
-                        ambientColor = Color.Black.copy(alpha = 0.1f)
-                    )
+                    .size(64.dp)
                     .clip(CircleShape)
-                    .background(ColorSurface)
-                    .border(1.5.dp, ColorBorder, CircleShape)
+                    .background(ColorRecordRed.copy(alpha = 0.1f))
+                    .border(1.5.dp, ColorRecordRed.copy(alpha = 0.3f), CircleShape)
                     .clickable { onStop() },
                 contentAlignment = Alignment.Center
             ) {
-                // Filled square icon for "stop"
                 Box(
                     modifier = Modifier
-                        .size(18.dp)
-                        .clip(RoundedCornerShape(3.dp))
+                        .size(20.dp)
+                        .clip(RoundedCornerShape(4.dp))
                         .background(ColorRecordRed)
                 )
             }
