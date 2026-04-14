@@ -3,10 +3,9 @@ package com.example.recall_ai.ui.liveai
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Info
@@ -38,6 +37,11 @@ val TextSecondary = Color(0xFF5E5E5E)
 val WaveBlueLight = Color(0xFF7BAAF7)
 val WavePurpleLight = Color(0xFFBA8DFA)
 val WaveCyanLight = Color(0xFF70DDE6)
+
+// Warm tones for PerformingAction aura
+val WaveAmberLight = Color(0xFFFFA726)
+val WaveGoldLight = Color(0xFFFFD54F)
+val WaveOrangeLight = Color(0xFFFF8A65)
 
 val ButtonLightSurface = Color(0xFFFFFFFF)
 val ButtonBorderGray = Color(0xFFE0E0E0)
@@ -122,29 +126,27 @@ fun LiveAiScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .padding(bottom = 48.dp),
-                horizontalArrangement = Arrangement.Center,
+                    .padding(horizontal = 32.dp, vertical = 48.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Interrupt / Hold Button — stops AI speech and switches to listening
-                ControlButton(
+                PillButton(
                     icon = if (isSpeaking) Icons.Rounded.Mic else Icons.Rounded.Pause,
                     label = if (isSpeaking) "Interrupt" else "Hold",
-                    backgroundColor = if (isSpeaking) Color(0xFF1A73E8) else ButtonLightSurface,
-                    iconColor = if (isSpeaking) Color.White else TextPrimary,
-                    hasShadow = true,
+                    backgroundColor = Color(0xFF1B2A4A),
+                    contentColor = Color.White,
+                    modifier = Modifier.weight(1f),
                     onClick = { viewModel.interruptAi() }
                 )
 
-                Spacer(modifier = Modifier.width(40.dp))
-
                 // End Button
-                ControlButton(
+                PillButton(
                     icon = Icons.Rounded.Close,
                     label = "End",
                     backgroundColor = ButtonRedLight,
-                    iconColor = Color.White,
-                    hasShadow = true,
+                    contentColor = Color.White,
+                    modifier = Modifier.weight(1f),
                     onClick = {
                         viewModel.stopSession()
                         onNavigateBack()
@@ -210,6 +212,7 @@ fun TopStatusBar(modifier: Modifier = Modifier, state: LiveAiState) {
                     is LiveAiState.Connecting -> "Connecting..."
                     is LiveAiState.Listening -> "Listening..."
                     is LiveAiState.Speaking -> "Speaking..."
+                    is LiveAiState.PerformingAction -> "Working..."
                     is LiveAiState.Error -> "Connection Lost"
                     else -> "Initializing..."
                 },
@@ -238,7 +241,9 @@ fun TopStatusBar(modifier: Modifier = Modifier, state: LiveAiState) {
 fun FluidLightAuraIndicator(state: LiveAiState, modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "fluidAura")
 
+    val isActing = state is LiveAiState.PerformingAction
     val durationMillis = when (state) {
+        is LiveAiState.PerformingAction -> 1200  // Fastest — urgent energy
         is LiveAiState.Speaking -> 2000
         is LiveAiState.Listening -> 4000
         else -> 6000
@@ -282,9 +287,14 @@ fun FluidLightAuraIndicator(state: LiveAiState, modifier: Modifier = Modifier) {
 
         // For light mode, we use standard alpha blending (SrcOver) instead of Screen blending
         // to prevent the colors from blowing out to pure white.
+        // Swap to warm amber/gold/orange tones when performing an action
+        val color1 = if (isActing) WaveAmberLight else WaveBlueLight
+        val color2 = if (isActing) WaveGoldLight else WavePurpleLight
+        val color3 = if (isActing) WaveOrangeLight else WaveCyanLight
+
         drawCircle(
             brush = Brush.radialGradient(
-                colors = listOf(WaveBlueLight.copy(alpha = 0.6f * baseAlpha), Color.Transparent),
+                colors = listOf(color1.copy(alpha = 0.6f * baseAlpha), Color.Transparent),
                 center = center1,
                 radius = radius
             ),
@@ -294,7 +304,7 @@ fun FluidLightAuraIndicator(state: LiveAiState, modifier: Modifier = Modifier) {
 
         drawCircle(
             brush = Brush.radialGradient(
-                colors = listOf(WavePurpleLight.copy(alpha = 0.5f * baseAlpha), Color.Transparent),
+                colors = listOf(color2.copy(alpha = 0.5f * baseAlpha), Color.Transparent),
                 center = center2,
                 radius = radius * 0.9f
             ),
@@ -304,7 +314,7 @@ fun FluidLightAuraIndicator(state: LiveAiState, modifier: Modifier = Modifier) {
 
         drawCircle(
             brush = Brush.radialGradient(
-                colors = listOf(WaveCyanLight.copy(alpha = 0.5f * baseAlpha), Color.Transparent),
+                colors = listOf(color3.copy(alpha = 0.5f * baseAlpha), Color.Transparent),
                 center = center3,
                 radius = radius * 0.8f
             ),
@@ -315,46 +325,39 @@ fun FluidLightAuraIndicator(state: LiveAiState, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ControlButton(
+fun PillButton(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
     backgroundColor: Color,
-    iconColor: Color,
-    hasShadow: Boolean = false,
+    contentColor: Color,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null,
-            onClick = onClick
-        )
+    Surface(
+        modifier = modifier.height(56.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = backgroundColor,
+        shadowElevation = 4.dp,
+        onClick = onClick
     ) {
-        Surface(
-            modifier = Modifier.size(64.dp),
-            shape = CircleShape,
-            color = backgroundColor,
-            shadowElevation = if (hasShadow) 6.dp else 0.dp,
-            border = if (backgroundColor == ButtonLightSurface)
-                androidx.compose.foundation.BorderStroke(1.dp, ButtonBorderGray)
-            else null
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    tint = iconColor,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = contentColor,
+                modifier = Modifier.size(22.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = label,
+                color = contentColor,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
         }
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = label,
-            color = TextSecondary,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium
-        )
     }
 }

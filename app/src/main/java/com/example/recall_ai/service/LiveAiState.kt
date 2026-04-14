@@ -19,6 +19,9 @@ sealed class LiveAiState {
     // AI is actively streaming audio back to the speaker
     data class Speaking(val meetingId: Long) : LiveAiState()
 
+    // AI is executing an action (setting reminder, etc.)
+    data class PerformingAction(val meetingId: Long) : LiveAiState()
+
     // Session gracefully ended
     data class Stopped(val meetingId: Long) : LiveAiState()
 
@@ -42,13 +45,15 @@ class LiveAiStateHolder @Inject constructor() {
     val isActive: Boolean
         get() = _state.value is LiveAiState.Connecting ||
                 _state.value is LiveAiState.Listening ||
-                _state.value is LiveAiState.Speaking
+                _state.value is LiveAiState.Speaking ||
+                _state.value is LiveAiState.PerformingAction
 
     val currentMeetingId: Long?
         get() = when (val s = _state.value) {
             is LiveAiState.Connecting -> s.meetingId
             is LiveAiState.Listening -> s.meetingId
             is LiveAiState.Speaking -> s.meetingId
+            is LiveAiState.PerformingAction -> s.meetingId
             is LiveAiState.Stopped -> s.meetingId
             is LiveAiState.Error -> s.meetingId
             LiveAiState.Idle -> null

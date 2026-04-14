@@ -28,6 +28,9 @@ sealed class Screen(val route: String) {
     /** Action items / To-Do list — aggregated from all meetings */
     object ActionItems : Screen("action_items")
 
+    /** Reminders & alarms set by Bob during Live AI sessions */
+    object Reminders : Screen("reminders")
+
     /**
      * Meeting detail — transcript + summary.
      * Implemented in Chapter 8.

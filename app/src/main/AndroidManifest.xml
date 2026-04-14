@@ -12,6 +12,10 @@
     <!-- ── Notifications ───────────────────────────────────────── -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- ── Exact alarms for AI-set reminders ───────────────────── -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
     <!-- ── Network (Whisper/Gemini API calls) ──────────────────── -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -28,6 +32,7 @@
     <application
         android:name=".RecallApplication"
         android:allowBackup="true"
+        android:windowSoftInputMode="adjustNothing"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -64,6 +69,20 @@
             android:name=".service.LiveAiService"
             android:exported="false"
             android:foregroundServiceType="microphone" />
+
+        <!-- ── Reminder alarm receiver ────────────────────────────── -->
+        <receiver
+            android:name=".receiver.ReminderAlarmReceiver"
+            android:exported="false" />
+
+        <!-- ── Re-schedule alarms after device reboot ────────────── -->
+        <receiver
+            android:name=".receiver.BootRescheduleReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name="androidx.startup.InitializationProvider"

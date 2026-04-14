@@ -48,6 +48,9 @@ class NotificationChannelManager @Inject constructor(
 
         /** Transient alerts: source changes, silence warnings, errors */
         const val CHANNEL_ALERTS = "recall_alerts"
+
+        /** High-priority reminders & alarms set by the AI assistant */
+        const val CHANNEL_REMINDERS = "recall_reminders"
     }
 
     private val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -55,6 +58,7 @@ class NotificationChannelManager @Inject constructor(
     fun createChannels() {
         createRecordingChannel()
         createAlertsChannel()
+        createRemindersChannel()
     }
 
     private fun createRecordingChannel() {
@@ -82,6 +86,19 @@ class NotificationChannelManager @Inject constructor(
             setShowBadge(false)
             enableVibration(false)
             setSound(null, null)   // Silent — visual only
+        }
+        nm.createNotificationChannel(channel)
+    }
+
+    private fun createRemindersChannel() {
+        val channel = NotificationChannel(
+            CHANNEL_REMINDERS,
+            "Reminders & Alarms",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Alarm notifications from AI-detected reminders"
+            enableVibration(true)
+            enableLights(true)
         }
         nm.createNotificationChannel(channel)
     }

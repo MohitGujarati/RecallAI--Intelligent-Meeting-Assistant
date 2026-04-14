@@ -18,6 +18,7 @@ import com.example.recall_ai.ui.login.AccountScreen
 import com.example.recall_ai.ui.login.LoginScreen
 import com.example.recall_ai.ui.meetingdetail.MeetingDetailScreen
 import com.example.recall_ai.ui.recording.RecordingScreen
+import com.example.recall_ai.ui.reminders.RemindersScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -70,6 +71,9 @@ fun AppNavigation(navController: NavHostController) {
                 onNavigateToActionItems = {
                     navController.navigate(Screen.ActionItems.route)
                 },
+                onNavigateToReminders = {
+                    navController.navigate(Screen.Reminders.route)
+                },
                 onNavigateToAccount = {
                     navController.navigate(Screen.Account.route)
                 }
@@ -96,6 +100,13 @@ fun AppNavigation(navController: NavHostController) {
         // ── Action Items / To-Do ──────────────────────────────────────────
         composable(Screen.ActionItems.route) {
             ActionItemsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // ── Reminders & Alarms ───────────────────────────────────────────
+        composable(Screen.Reminders.route) {
+            RemindersScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

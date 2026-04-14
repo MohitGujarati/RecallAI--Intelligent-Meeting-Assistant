@@ -2,10 +2,13 @@ package com.example.recall_ai.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.recall_ai.data.local.AppDatabase
 import com.example.recall_ai.data.local.dao.AudioChunkDao
 import com.example.recall_ai.data.local.dao.ChatMessageDao
 import com.example.recall_ai.data.local.dao.MeetingDao
+import com.example.recall_ai.data.local.dao.ReminderDao
 import com.example.recall_ai.data.local.dao.SummaryDao
 import com.example.recall_ai.data.local.dao.TranscriptDao
 import dagger.Module
@@ -51,6 +54,27 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
+    /** Migration 3→4: Add the reminders table for AI-driven reminders & alarms. */
+    private val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS `reminders` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `meetingId` INTEGER,
+                    `type` TEXT NOT NULL,
+                    `title` TEXT NOT NULL,
+                    `description` TEXT,
+                    `triggerAtMillis` INTEGER,
+                    `status` TEXT NOT NULL DEFAULT 'PENDING',
+                    `createdAt` INTEGER NOT NULL,
+                    `updatedAt` INTEGER NOT NULL,
+                    FOREIGN KEY(`meetingId`) REFERENCES `meetings`(`id`) ON DELETE CASCADE
+                )
+            """.trimIndent())
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_reminders_meetingId` ON `reminders` (`meetingId`)")
+        }
+    }
+
     @Provides
     @Singleton
     fun provideAppDatabase(
@@ -61,12 +85,9 @@ object DatabaseModule {
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
         )
-            // ── Development safety net ────────────────────────────────────────
-            // Wipes and recreates the DB instead of crashing on unhandled migration.
-            // REMOVE before shipping — replace with explicit Migration objects.
+            .addMigrations(MIGRATION_3_4)
+            // Fallback only for migrations we haven't written yet (safety net during dev)
             .fallbackToDestructiveMigration()
-            // ── Future migrations (add before removing fallback above) ─────────
-            // .addMigrations(MIGRATION_1_2)
             .build()
 
     // ── DAO providers ─────────────────────────────────────────────────────────
@@ -95,4 +116,8 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideChatMessageDao(db: AppDatabase): ChatMessageDao = db.chatMessageDao()
+
+    @Provides
+    @Singleton
+    fun provideReminderDao(db: AppDatabase): ReminderDao = db.reminderDao()
 }

@@ -4,6 +4,8 @@ import androidx.room.TypeConverter
 import com.example.recall_ai.data.local.entity.AudioSource
 import com.example.recall_ai.data.local.entity.MeetingStatus
 import com.example.recall_ai.data.local.entity.PauseReason
+import com.example.recall_ai.data.local.entity.ReminderStatus
+import com.example.recall_ai.data.local.entity.ReminderType
 import com.example.recall_ai.data.local.entity.SummaryStatus
 import com.example.recall_ai.data.local.entity.TranscriptSource
 import com.example.recall_ai.data.local.entity.TranscriptionStatus
@@ -68,4 +70,22 @@ class Converters {
     @TypeConverter
     fun toSummaryStatus(value: String): SummaryStatus =
         SummaryStatus.valueOf(value)
+
+    // ── ReminderType ─────────────────────────────────────────────────────
+
+    @TypeConverter
+    fun fromReminderType(value: ReminderType): String = value.name
+
+    @TypeConverter
+    fun toReminderType(value: String): ReminderType =
+        ReminderType.valueOf(value)
+
+    // ── ReminderStatus ───────────────────────────────────────────────────
+
+    @TypeConverter
+    fun fromReminderStatus(value: ReminderStatus): String = value.name
+
+    @TypeConverter
+    fun toReminderStatus(value: String): ReminderStatus =
+        ReminderStatus.valueOf(value)
 }

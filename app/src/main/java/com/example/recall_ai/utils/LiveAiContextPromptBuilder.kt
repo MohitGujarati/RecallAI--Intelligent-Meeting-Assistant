@@ -7,19 +7,25 @@ package com.example.recall_ai.utils
 object LiveAiContextPromptBuilder {
 
     /**
-     * Builds the initial context prompt.
-     * If the meeting is short, we just pass the default summary text.
+     * Builds the initial context prompt for a single-meeting session.
+     * @param toolInstructions Combined prompt instructions from [ToolRegistry.getPromptInstructions].
      */
-    fun buildInitialPrompt(title: String, defaultSummary: String?): String {
+    fun buildInitialPrompt(
+        title: String,
+        defaultSummary: String?,
+        toolInstructions: String = ""
+    ): String {
         return """
             You are 'Recall AI', an expert meeting assistant.
             You are currently having a real-time voice conversation with the user regarding a meeting titled "$title".
-            
+
             Here is the summary of the meeting so far. Use this to answer the user's questions accurately.
             Keep your spoken responses natural, conversational, and concise. Do not read out lists verbatim unless asked.
-            
+
             MEETING SUMMARY:
             ${defaultSummary ?: "No summary available yet."}
+
+            $toolInstructions
         """.trimIndent()
     }
 
@@ -43,8 +49,13 @@ object LiveAiContextPromptBuilder {
      * Builds a global context prompt from ALL the user's meeting summaries.
      * Used by the home screen Live AI (meetingId == 0L).
      */
+    /**
+     * Builds a global context prompt from ALL the user's meeting summaries.
+     * @param toolInstructions Combined prompt instructions from [ToolRegistry.getPromptInstructions].
+     */
     fun buildGlobalPrompt(
-        summaries: List<com.example.recall_ai.data.local.entity.Summary>
+        summaries: List<com.example.recall_ai.data.local.entity.Summary>,
+        toolInstructions: String = ""
     ): String {
         if (summaries.isEmpty()) {
             return """
@@ -52,6 +63,8 @@ object LiveAiContextPromptBuilder {
                 You are having a real-time voice conversation with the user.
                 The user has no meeting records yet. Let them know and offer to help with anything else.
                 Keep your spoken responses natural, conversational, and concise.
+
+                $toolInstructions
             """.trimIndent()
         }
 
@@ -67,13 +80,15 @@ object LiveAiContextPromptBuilder {
         return """
             You are 'Recall AI', a smart voice assistant with full knowledge of the user's meeting history.
             You are having a real-time voice conversation. The user can ask you about ANY of their past meetings.
-            
+
             Below are summaries, key points, and action items from their ${summaries.size} most recent meetings.
             Use this context to answer questions accurately.
             Keep your spoken responses natural, conversational, and concise.
-            
+
             ══ MEETINGS ══
             $meetingsBlock
+
+            $toolInstructions
         """.trimIndent()
     }
 }

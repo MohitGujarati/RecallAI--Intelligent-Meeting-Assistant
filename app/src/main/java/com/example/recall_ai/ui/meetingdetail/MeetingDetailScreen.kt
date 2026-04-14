@@ -63,6 +63,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -161,6 +162,7 @@ fun MeetingDetailScreen(
             AnimatedContent(
                 targetState    = selectedTab,
                 transitionSpec = { fadeIn(tween(200)) togetherWith fadeOut(tween(150)) },
+                modifier       = Modifier.weight(1f).clipToBounds(),
                 label          = "tabContent"
             ) { tab ->
                 when (tab) {
@@ -182,7 +184,7 @@ fun MeetingDetailScreen(
                         // Correct intent: tapping the mic button navigates to the Live AI screen.
                         onLiveAiClick      = { onNavigateToLiveAi(meetingId) },
                         onStopSpeakingClick = viewModel::stopAiSpeaking,
-                        modifier           = Modifier.padding(bottom = 16.dp)
+
                     )
                 }
             }

@@ -43,6 +43,16 @@ class GeminiLiveClient(
     private val _errorFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val errorFlow: Flow<String> = _errorFlow
 
+    /** Emitted when Gemini invokes a declared function (e.g. set_reminder). */
+    data class FunctionCallEvent(
+        val callId: String,
+        val functionName: String,
+        val args: Map<String, Any?>
+    )
+
+    private val _functionCallFlow = MutableSharedFlow<FunctionCallEvent>(extraBufferCapacity = 8)
+    val functionCallFlow: Flow<FunctionCallEvent> = _functionCallFlow
+
     /** Completes when the server acknowledges the setup frame. */
     private var _setupComplete = CompletableDeferred<Unit>()
 
@@ -55,7 +65,16 @@ class GeminiLiveClient(
      * Suspends until the server acknowledges setup (setupComplete) or
      * a 30-second timeout is reached.
      */
-    suspend fun connect(initialContext: String) {
+    /**
+     * Opens the WebSocket and sends the Setup frame.
+     * @param initialContext System prompt text.
+     * @param toolDeclarations JSON-ready list from [ToolRegistry.getDeclarations].
+     *                         Empty list = no function calling for this session.
+     */
+    suspend fun connect(
+        initialContext: String,
+        toolDeclarations: List<Map<String, Any?>> = emptyList()
+    ) {
         _setupComplete = CompletableDeferred()
         audioChunksSent = 0
 
@@ -64,6 +83,7 @@ class GeminiLiveClient(
         Log.i(TAG, "│ URL   : ${url.take(80)}…")
         Log.i(TAG, "│ Model : ${AiModelConfig.GEMINI_LIVE_MODEL}")
         Log.i(TAG, "│ Context length : ${initialContext.length} chars")
+        Log.i(TAG, "│ Tools : ${toolDeclarations.size} declared")
         Log.i(TAG, "└────────────────────────────────────────────────")
 
         val request = Request.Builder().url(url).build()
@@ -71,7 +91,7 @@ class GeminiLiveClient(
         webSocket = okHttpClient.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 Log.i(TAG, "✅ WebSocket OPENED — HTTP ${response.code}")
-                sendSetupFrame(initialContext)
+                sendSetupFrame(initialContext, toolDeclarations)
             }
 
             // ── TEXT messages (JSON) ──────────────────────────────────
@@ -172,6 +192,27 @@ class GeminiLiveClient(
         Log.i(TAG, "Hot-swapped Live AI context (${newContext.length} chars)")
     }
 
+    /**
+     * Sends the result of a function call back to Gemini so it can
+     * continue the conversation (e.g. confirm the reminder was set).
+     */
+    fun sendFunctionResponse(callId: String, functionName: String, result: Map<String, Any?>) {
+        val ws = webSocket ?: return
+        val payload = mapOf(
+            "toolResponse" to mapOf(
+                "functionResponses" to listOf(
+                    mapOf(
+                        "id" to callId,
+                        "name" to functionName,
+                        "response" to result
+                    )
+                )
+            )
+        )
+        ws.send(gson.toJson(payload))
+        Log.i(TAG, "⬆ Sent function response for $functionName (id=$callId)")
+    }
+
     fun disconnect() {
         Log.i(TAG, "disconnect() called — closing WebSocket")
         webSocket?.close(1000, "User ended session")
@@ -202,34 +243,44 @@ class GeminiLiveClient(
      * outside generationConfig causes the v1beta server to silently
      * ignore the setup frame.
      */
-    private fun sendSetupFrame(contextPrompt: String) {
-        val setupPayload = mapOf(
-            "setup" to mapOf(
-                "model" to "models/${AiModelConfig.GEMINI_LIVE_MODEL}",
+    private fun sendSetupFrame(
+        contextPrompt: String,
+        toolDeclarations: List<Map<String, Any?>>
+    ) {
+        val setupBody = mutableMapOf<String, Any?>(
+            "model" to "models/${AiModelConfig.GEMINI_LIVE_MODEL}",
 
-                "systemInstruction" to mapOf(
-                    "parts" to listOf(mapOf("text" to contextPrompt))
-                ),
+            "systemInstruction" to mapOf(
+                "parts" to listOf(mapOf("text" to contextPrompt))
+            ),
 
-                "generationConfig" to mapOf(
-                    "responseModalities" to listOf("AUDIO"),
-                    "mediaResolution"    to "MEDIA_RESOLUTION_MEDIUM",
-                    "speechConfig"       to mapOf(
-                        "voiceConfig" to mapOf(
-                            "prebuiltVoiceConfig" to mapOf("voiceName" to "Zephyr")
-                        )
+            "generationConfig" to mapOf(
+                "responseModalities" to listOf("AUDIO"),
+                "mediaResolution"    to "MEDIA_RESOLUTION_MEDIUM",
+                "speechConfig"       to mapOf(
+                    "voiceConfig" to mapOf(
+                        "prebuiltVoiceConfig" to mapOf("voiceName" to "Zephyr")
                     )
-                ),
-
-                // contextWindowCompression is at the SETUP level, NOT inside
-                // generationConfig. The server rejects it with code 1007 if
-                // placed inside generationConfig.
-                "contextWindowCompression" to mapOf(
-                    "triggerTokens" to 104857,
-                    "slidingWindow" to mapOf("targetTokens" to 52428)
                 )
+            ),
+
+            // contextWindowCompression is at the SETUP level, NOT inside
+            // generationConfig. The server rejects it with code 1007 if
+            // placed inside generationConfig.
+            "contextWindowCompression" to mapOf(
+                "triggerTokens" to 104857,
+                "slidingWindow" to mapOf("targetTokens" to 52428)
             )
         )
+
+        // Only attach tools block if there are declarations from the registry
+        if (toolDeclarations.isNotEmpty()) {
+            setupBody["tools"] = listOf(
+                mapOf("functionDeclarations" to toolDeclarations)
+            )
+        }
+
+        val setupPayload = mapOf("setup" to setupBody)
 
         val json = gson.toJson(setupPayload)
         Log.i(TAG, "⬆ Sending setup frame (${json.length} chars)")
@@ -275,6 +326,18 @@ class GeminiLiveClient(
                     if (textContent != null) {
                         Log.d(TAG, "📝 Text from model: $textContent")
                     }
+
+                    // ── Function call from Gemini (agent tool use) ───────
+                    @Suppress("UNCHECKED_CAST")
+                    val functionCall = part["functionCall"] as? Map<String, Any?>
+                    if (functionCall != null) {
+                        val name = functionCall["name"] as? String ?: ""
+                        val args = (functionCall["args"] as? Map<String, Any?>) ?: emptyMap()
+                        val callId = functionCall["id"] as? String
+                            ?: "${name}_${System.currentTimeMillis()}"
+                        Log.i(TAG, "🔧 Function call: $name($args) id=$callId")
+                        _functionCallFlow.tryEmit(FunctionCallEvent(callId, name, args))
+                    }
                 }
 
                 val turnComplete = serverContent["turnComplete"]
@@ -286,7 +349,24 @@ class GeminiLiveClient(
                 return
             }
 
-            // ── 2. Error responses from API ───────────────────────────────
+            // ── 2. toolCall (Live API sends function calls here, NOT in serverContent)
+            @Suppress("UNCHECKED_CAST")
+            val toolCall = root["toolCall"] as? Map<String, Any?>
+            if (toolCall != null) {
+                val functionCalls = toolCall["functionCalls"] as? List<*>
+                functionCalls?.filterIsInstance<Map<*, *>>()?.forEach { fc ->
+                    val name = fc["name"] as? String ?: ""
+                    @Suppress("UNCHECKED_CAST")
+                    val args = (fc["args"] as? Map<String, Any?>) ?: emptyMap()
+                    val callId = fc["id"] as? String
+                        ?: "${name}_${System.currentTimeMillis()}"
+                    Log.i(TAG, "🔧 toolCall: $name($args) id=$callId")
+                    _functionCallFlow.tryEmit(FunctionCallEvent(callId, name, args))
+                }
+                return
+            }
+
+            // ── 3. Error responses from API ───────────────────────────────
             val error = root["error"] as? Map<*, *>
             if (error != null) {
                 val errorMsg = error["message"]?.toString() ?: "Unknown API error"
@@ -296,7 +376,7 @@ class GeminiLiveClient(
                 return
             }
 
-            // ── 3. Unrecognized message ──────────────────────────────────
+            // ── 4. Unrecognized message ──────────────────────────────────
             Log.w(TAG, "⚠️ Unrecognized message keys: ${root.keys}")
 
         } catch (e: Exception) {

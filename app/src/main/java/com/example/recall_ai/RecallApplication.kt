@@ -2,6 +2,7 @@ package com.example.recall_ai
 
 import android.app.Application
 import android.util.Log
+import androidx.core.view.WindowCompat
 import androidx.work.Configuration
 import com.example.recall_ai.service.recovery.ProcessDeathRecoveryManager
 import com.google.firebase.FirebaseApp

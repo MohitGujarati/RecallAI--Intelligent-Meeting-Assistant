@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.TaskAlt
@@ -179,6 +180,7 @@ fun DashboardScreen(
     onNavigateToAllRecalls: () -> Unit,
     onNavigateToGlobalLiveAi: () -> Unit,
     onNavigateToActionItems: () -> Unit = {},
+    onNavigateToReminders: () -> Unit = {},
     onNavigateToAccount: () -> Unit = {},
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
@@ -210,7 +212,7 @@ fun DashboardScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     item { DashboardGreeting() }
-                    item { FeatureCards(onToDoClick = onNavigateToActionItems) }
+                    item { FeatureCards(onToDoClick = onNavigateToActionItems, onRemindersClick = onNavigateToReminders) }
 
                     if (meetings.isEmpty()) {
                         item { EmptyState(modifier = Modifier.padding(top = 48.dp)) }
@@ -539,27 +541,23 @@ private fun DashboardGreeting() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 @Composable
-private fun FeatureCards(onToDoClick: () -> Unit = {}) {
+private fun FeatureCards(onToDoClick: () -> Unit = {}, onRemindersClick: () -> Unit = {}) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // Pass ColorNavy to tint the vector icon
         FeatureCard(
             title = "To-Do",
-            subtitle = "View all action items", // Removed the \n
+            subtitle = "View all action items",
             icon = rememberVectorPainter(image = Icons.Default.TaskAlt),
             iconTint = ColorNavy,
             onClick = onToDoClick
         )
 
-        // Pass 'null' for the tint so SuperBOB stays full-color!
-        /*
         FeatureCard(
-            title = "SuperBOB",
-            subtitle = "Your mini assistant who can help you with tasks and chats, schedule, reminders and more", // Removed the \n
-            icon = painterResource(id = R.drawable.ic_app_icon),
-            iconTint = null
+            title = "Reminders",
+            subtitle = "Alarms & to-dos set by Bob",
+            icon = rememberVectorPainter(image = Icons.Default.Notifications),
+            iconTint = ColorNavy,
+            onClick = onRemindersClick
         )
-         */
-
     }
 }
 

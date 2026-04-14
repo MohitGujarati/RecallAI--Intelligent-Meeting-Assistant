@@ -12,11 +12,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.recall_ai.service.LiveAiState
 import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 
 // --- Mascot Colors ---
-val BobBodyColors = Color(0xFF3F51B5) // Indigo Blue
-val BobBodyErrorColor = Color(0xFFD32F2F) // Muted Red
-val BobEyeColors = Color(0xFF2D2D2D)  // Soft black
+val BobBodyColors = Color(0xFF3F51B5)      // Indigo Blue
+val BobBodyErrorColor = Color(0xFFD32F2F)  // Muted Red
+val BobBodyActionColor = Color(0xFFFF8F00) // Amber — "working on it"
+val BobOrbitDotColor = Color(0xFFFFB74D)   // Light amber for orbiting dots
+val BobEyeColors = Color(0xFF2D2D2D)       // Soft black
 
 @Composable
 fun LiveMascot(
@@ -28,19 +32,24 @@ fun LiveMascot(
     val infiniteTransition = rememberInfiniteTransition(label = "bobAnimations")
 
     // --- STATE-DRIVEN COLORS ---
-    // Shifts to red on error, pulses brighter when speaking
+    // Shifts to red on error, amber on action, pulses brighter when speaking/acting
+    val isActing = state is LiveAiState.PerformingAction
     val colorPulse by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = if (state is LiveAiState.Speaking) 0.8f else 1f,
+        targetValue = if (state is LiveAiState.Speaking || isActing) 0.8f else 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(400, easing = LinearEasing),
+            animation = tween(if (isActing) 300 else 400, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "colorPulse"
     )
 
     val bodyColor by animateColorAsState(
-        targetValue = if (state is LiveAiState.Error) BobBodyErrorColor else BobBodyColors,
+        targetValue = when {
+            state is LiveAiState.Error -> BobBodyErrorColor
+            isActing -> BobBodyActionColor
+            else -> BobBodyColors
+        },
         animationSpec = tween(500),
         label = "bodyColor"
     )
@@ -50,12 +59,14 @@ fun LiveMascot(
     // Bobbing stops when listening (focused), speeds up when speaking
     val floatDuration = when (state) {
         is LiveAiState.Speaking -> 1000
-        is LiveAiState.Listening -> 4000 // Very slow
+        is LiveAiState.PerformingAction -> 600  // Quick, contained bobbing
+        is LiveAiState.Listening -> 4000        // Very slow
         else -> 2500
     }
     val floatTarget = when (state) {
-        is LiveAiState.Listening -> 2f  // Barely moves
-        is LiveAiState.Speaking -> 15f  // Energetic
+        is LiveAiState.Listening -> 2f           // Barely moves
+        is LiveAiState.Speaking -> 15f           // Energetic
+        is LiveAiState.PerformingAction -> 5f    // Tight, focused
         else -> 12f
     }
 
@@ -72,9 +83,20 @@ fun LiveMascot(
     // --- STATE-DRIVEN BREATHING ---
     val breathScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = if (state is LiveAiState.Speaking) 1.08f else 1.02f,
+        targetValue = when (state) {
+            is LiveAiState.Speaking -> 1.08f
+            is LiveAiState.PerformingAction -> 1.05f
+            else -> 1.02f
+        },
         animationSpec = infiniteRepeatable(
-            animation = tween(if (state is LiveAiState.Speaking) 600 else 1800, easing = EaseInOutSine),
+            animation = tween(
+                when (state) {
+                    is LiveAiState.Speaking -> 600
+                    is LiveAiState.PerformingAction -> 400
+                    else -> 1800
+                },
+                easing = EaseInOutSine
+            ),
             repeatMode = RepeatMode.Reverse
         ),
         label = "breath"
@@ -83,8 +105,9 @@ fun LiveMascot(
     // --- STATE-DRIVEN POSTURES (TENTACLES) ---
     val tentacleLift by animateFloatAsState(
         targetValue = when (state) {
-            is LiveAiState.Listening -> -24f // Tentacles high up
-            is LiveAiState.Error -> 15f      // Dropped completely flat
+            is LiveAiState.Listening -> -24f        // Tentacles high up
+            is LiveAiState.PerformingAction -> -12f  // Slightly raised, alert
+            is LiveAiState.Error -> 15f              // Dropped completely flat
             is LiveAiState.Connecting -> 5f
             else -> 0f
         },
@@ -94,10 +117,11 @@ fun LiveMascot(
 
     // --- STATE-DRIVEN EYES ---
     val targetEyeScale = when (state) {
-        is LiveAiState.Listening -> 1.3f   // Wide awake/attentive
-        is LiveAiState.Connecting -> 0.4f  // Thinking/loading
-        is LiveAiState.Error -> 0.1f       // Slits/Sad
-        else -> 1.0f                       // Normal
+        is LiveAiState.Listening -> 1.3f        // Wide awake/attentive
+        is LiveAiState.PerformingAction -> 0.5f  // Squinting — concentration
+        is LiveAiState.Connecting -> 0.4f        // Thinking/loading
+        is LiveAiState.Error -> 0.1f             // Slits/Sad
+        else -> 1.0f                             // Normal
     }
 
     val eyeStateScale by animateFloatAsState(
@@ -121,8 +145,40 @@ fun LiveMascot(
         label = "blink"
     )
 
+    // --- PERFORMING-ACTION: Horizontal wobble ---
+    val wobbleAmplitude by animateFloatAsState(
+        targetValue = if (isActing) 8f else 0f,
+        animationSpec = tween(300),
+        label = "wobbleAmp"
+    )
+    val wobbleRaw by infiniteTransition.animateFloat(
+        initialValue = -1f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(250, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "wobble"
+    )
+
+    // --- PERFORMING-ACTION: Orbiting dots ---
+    val orbitPhase by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = (2f * Math.PI).toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "orbit"
+    )
+    val orbitAlpha by animateFloatAsState(
+        targetValue = if (isActing) 0.9f else 0f,
+        animationSpec = tween(400),
+        label = "orbitAlpha"
+    )
+
     Canvas(modifier = modifier) {
-        val centerX = size.width / 2
+        val centerX = (size.width / 2) + (wobbleRaw * wobbleAmplitude)
         val centerY = (size.height / 2) + floatOffset
 
         val unit = size.width * 0.1f
@@ -185,6 +241,26 @@ fun LiveMascot(
                     topLeft = Offset(xPos - (eyeSize / 2), eyeCenterY - (eyeSize / 2 * actualEyeScale)),
                     size = Size(eyeSize, eyeSize * actualEyeScale),
                     cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
+                )
+            }
+        }
+
+        // --- PERFORMING-ACTION: Orbiting dots ---
+        if (orbitAlpha > 0.01f) {
+            val orbitRadiusX = bodyW * 0.58f
+            val orbitRadiusY = bodyH * 0.58f
+            val numDots = 3
+            for (i in 0 until numDots) {
+                val angle = orbitPhase + (i * 2f * Math.PI.toFloat() / numDots)
+                val dotX = centerX + orbitRadiusX * cos(angle)
+                val dotY = centerY + orbitRadiusY * sin(angle)
+                // Dots get smaller as they go "behind" (sin < 0 = top = far side)
+                val depthScale = 0.6f + 0.4f * ((sin(angle) + 1f) / 2f)
+                val dotRadius = unit * 0.22f * depthScale
+                drawCircle(
+                    color = BobOrbitDotColor.copy(alpha = orbitAlpha * depthScale),
+                    radius = dotRadius,
+                    center = Offset(dotX, dotY)
                 )
             }
         }

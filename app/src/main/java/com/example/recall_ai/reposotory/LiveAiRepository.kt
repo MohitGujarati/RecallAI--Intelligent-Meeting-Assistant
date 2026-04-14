@@ -6,6 +6,7 @@ import com.example.recall_ai.data.local.dao.MeetingDao
 import com.example.recall_ai.data.local.dao.SummaryDao
 import com.example.recall_ai.data.local.dao.TranscriptDao
 import com.example.recall_ai.data.remote.api.GeminiLiveClient
+import com.example.recall_ai.data.remote.tools.ToolRegistry
 import com.example.recall_ai.service.LiveAiState
 import com.example.recall_ai.service.LiveAiStateHolder
 import com.example.recall_ai.service.audio.AudioRecorder
@@ -33,7 +34,8 @@ class LiveAiRepository @Inject constructor(
     private val meetingDao: MeetingDao,
     private val summaryDao: SummaryDao,
     private val transcriptDao: TranscriptDao,
-    private val stateHolder: LiveAiStateHolder
+    private val stateHolder: LiveAiStateHolder,
+    private val toolRegistry: ToolRegistry
 ) {
     companion object {
         /** Sentinel meetingId — triggers global context mode (all meetings) */
@@ -70,13 +72,16 @@ class LiveAiRepository @Inject constructor(
                 // 1. Build context — either single-meeting or global
                 val initialContext: String
                 val durationSeconds: Long
+                val toolInstructions = toolRegistry.getPromptInstructions()
 
                 if (meetingId == GLOBAL_MEETING_ID) {
                     // ── GLOBAL MODE: aggregate all summaries ──────────────
                     Log.d(TAG, "[1/4] GLOBAL MODE — fetching all summaries…")
                     val allSummaries = summaryDao.getAllCompletedSummaries()
                     Log.d(TAG, "[1/4] Found ${allSummaries.size} completed summaries")
-                    initialContext = LiveAiContextPromptBuilder.buildGlobalPrompt(allSummaries)
+                    initialContext = LiveAiContextPromptBuilder.buildGlobalPrompt(
+                        allSummaries, toolInstructions
+                    )
                     durationSeconds = 0L   // no smart-context swap for global
                 } else {
                     // ── SINGLE-MEETING MODE (existing behavior) ──────────
@@ -90,7 +95,8 @@ class LiveAiRepository @Inject constructor(
 
                     initialContext = LiveAiContextPromptBuilder.buildInitialPrompt(
                         title = meeting.title,
-                        defaultSummary = existingSummary?.summary
+                        defaultSummary = existingSummary?.summary,
+                        toolInstructions = toolInstructions
                     )
                     durationSeconds = meeting.durationSeconds
                 }
@@ -102,7 +108,7 @@ class LiveAiRepository @Inject constructor(
                 audioTrackManager.start()
 
                 Log.d(TAG, "[2/4] Connecting to Gemini Live WebSocket…")
-                geminiLiveClient.connect(initialContext)
+                geminiLiveClient.connect(initialContext, toolRegistry.getDeclarations())
                 Log.i(TAG, "[2/4] ✅ WebSocket connected and setup confirmed!")
 
                 stateHolder.emit(LiveAiState.Listening(meetingId))
@@ -113,6 +119,7 @@ class LiveAiRepository @Inject constructor(
                 launchAudioInput()
                 launchAudioOutput(meetingId)
                 launchNetworkEvents(meetingId)
+                launchFunctionCallHandler(meetingId)
                 Log.i(TAG, "[3/4] ✅ All pipelines running")
 
                 // 4. Smart Context Logic (>= 30 minutes, single-meeting only)
@@ -239,6 +246,26 @@ class LiveAiRepository @Inject constructor(
                 stateHolder.emit(LiveAiState.Error(meetingId, error))
                 stopSession()
             }
+        }
+    }
+
+    // ── Function Call Handling (delegated to ToolRegistry) ────────────
+
+    private fun CoroutineScope.launchFunctionCallHandler(meetingId: Long) = launch(Dispatchers.IO) {
+        Log.d(TAG, "🔧 Function call handler started")
+        val dbMeetingId = if (meetingId == GLOBAL_MEETING_ID) null else meetingId
+
+        geminiLiveClient.functionCallFlow.collect { event ->
+            Log.i(TAG, "🔧 Processing function call: ${event.functionName}(${event.args})")
+
+            stateHolder.emit(LiveAiState.PerformingAction(meetingId))
+
+            val result = toolRegistry.execute(event.functionName, event.args, dbMeetingId)
+            geminiLiveClient.sendFunctionResponse(
+                event.callId, event.functionName, result.toResponseMap()
+            )
+
+            stateHolder.emit(LiveAiState.Listening(meetingId))
         }
     }
 
