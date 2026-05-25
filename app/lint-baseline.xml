@@ -1,0 +1,1582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.13.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.13.2)" variant="all" version="8.13.2">
+
+    <issue
+        id="InlinedApi"
+        message="Field requires API level 26 (current min is 24): `android.media.AudioTrack#PERFORMANCE_MODE_LOW_LATENCY`"
+        errorLine1="            .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/audio/AudioTrackManager.kt"
+            line="60"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="InlinedApi"
+        message="Field requires API level 30 (current min is 29): `android.content.pm.ServiceInfo#FOREGROUND_SERVICE_TYPE_MICROPHONE`"
+        errorLine1="            startForeground(NOTIFICATION_ID, buildNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/LiveAiService.kt"
+            line="135"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioFocusRequest.Builder()`"
+        errorLine1="        focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)"
+        errorLine2="                                         ~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/interruption/AudioFocusHandler.kt"
+            line="111"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioFocusRequest.Builder#setAudioAttributes`"
+        errorLine1="            .setAudioAttributes(attrs)"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/interruption/AudioFocusHandler.kt"
+            line="112"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioFocusRequest.Builder#setOnAudioFocusChangeListener`"
+        errorLine1="            .setOnAudioFocusChangeListener(listener)"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/interruption/AudioFocusHandler.kt"
+            line="113"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioFocusRequest.Builder#setAcceptsDelayedFocusGain`"
+        errorLine1="            .setAcceptsDelayedFocusGain(false)"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/interruption/AudioFocusHandler.kt"
+            line="114"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioFocusRequest.Builder#build`"
+        errorLine1="            .build()"
+        errorLine2="             ~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/interruption/AudioFocusHandler.kt"
+            line="119"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioManager#requestAudioFocus`"
+        errorLine1="        val result = audioManager!!.requestAudioFocus(focusRequest!!)"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/interruption/AudioFocusHandler.kt"
+            line="121"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioManager#abandonAudioFocusRequest`"
+        errorLine1="            audioManager?.abandonAudioFocusRequest(it)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/interruption/AudioFocusHandler.kt"
+            line="129"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioTrack.Builder#setPerformanceMode`"
+        errorLine1="            .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/audio/AudioTrackManager.kt"
+            line="60"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel()`"
+        errorLine1="        val channel = NotificationChannel("
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="64"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#setDescription`"
+        errorLine1="            description = &quot;Shown while Recall is actively recording audio&quot;"
+        errorLine2="            ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="69"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#setDescription`"
+        errorLine1="            description = &quot;Shown while Recall is actively recording audio&quot;"
+        errorLine2="                        ~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="69"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#setShowBadge`"
+        errorLine1="            setShowBadge(false)"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="70"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#enableLights`"
+        errorLine1="            enableLights(false)"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="71"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#enableVibration`"
+        errorLine1="            enableVibration(false)"
+        errorLine2="            ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="72"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#setSound`"
+        errorLine1="            setSound(null, null)   // Explicitly silent — no default sound"
+        errorLine2="            ~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="73"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationManager#createNotificationChannel`"
+        errorLine1="        nm.createNotificationChannel(channel)"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="75"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel()`"
+        errorLine1="        val channel = NotificationChannel("
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="79"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#setDescription`"
+        errorLine1="            description = &quot;Alerts about microphone, storage, and audio source changes&quot;"
+        errorLine2="            ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="84"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#setDescription`"
+        errorLine1="            description = &quot;Alerts about microphone, storage, and audio source changes&quot;"
+        errorLine2="                        ~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="84"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#setShowBadge`"
+        errorLine1="            setShowBadge(false)"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="85"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#enableVibration`"
+        errorLine1="            enableVibration(false)"
+        errorLine2="            ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="86"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#setSound`"
+        errorLine1="            setSound(null, null)   // Silent — visual only"
+        errorLine2="            ~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="87"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationManager#createNotificationChannel`"
+        errorLine1="        nm.createNotificationChannel(channel)"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="89"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel()`"
+        errorLine1="        val channel = NotificationChannel("
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="93"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#setDescription`"
+        errorLine1="            description = &quot;Alarm notifications from AI-detected reminders&quot;"
+        errorLine2="            ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="98"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#setDescription`"
+        errorLine1="            description = &quot;Alarm notifications from AI-detected reminders&quot;"
+        errorLine2="                        ~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="98"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#enableVibration`"
+        errorLine1="            enableVibration(true)"
+        errorLine2="            ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="99"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#enableLights`"
+        errorLine1="            enableLights(true)"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="100"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationManager#createNotificationChannel`"
+        errorLine1="        nm.createNotificationChannel(channel)"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="102"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationManager#getNotificationChannel`"
+        errorLine1="        val channel = nm.getNotificationChannel(CHANNEL_RECORDING)"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="107"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.app.NotificationChannel#getImportance`"
+        errorLine1="        return channel?.importance == NotificationManager.IMPORTANCE_NONE"
+        errorLine2="                        ~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/notification/NotificationChannelManager.kt"
+            line="108"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioFocusRequest.Builder()`"
+        errorLine1="            val req = android.media.AudioFocusRequest.Builder("
+        errorLine2="                                                      ~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/RecordingService.kt"
+            line="325"
+            column="55"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioFocusRequest.Builder#setAudioAttributes`"
+        errorLine1="                .setAudioAttributes(attrs)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/RecordingService.kt"
+            line="328"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioFocusRequest.Builder#setOnAudioFocusChangeListener`"
+        errorLine1="                .setOnAudioFocusChangeListener { /* never pause — user controls recording */ }"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/RecordingService.kt"
+            line="329"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioFocusRequest.Builder#setAcceptsDelayedFocusGain`"
+        errorLine1="                .setAcceptsDelayedFocusGain(false)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/RecordingService.kt"
+            line="330"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioFocusRequest.Builder#build`"
+        errorLine1="                .build()"
+        errorLine2="                 ~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/RecordingService.kt"
+            line="331"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 24): `android.media.AudioManager#requestAudioFocus`"
+        errorLine1="            am.requestAudioFocus(req)"
+        errorLine2="               ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/service/RecordingService.kt"
+            line="332"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="RedundantLabel"
+        message="Redundant label can be removed"
+        errorLine1="            android:label=&quot;@string/app_name&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="48"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
+        errorLine1="    android:width=&quot;240dp&quot;"
+        errorLine2="                   ~~~~~">
+        <location
+            file="src/main/res/drawable/ic_bob_icon.xml"
+            line="2"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.application than 8.13.2 is available: 9.2.1"
+        errorLine1="agp = &quot;8.13.2&quot;"
+        errorLine2="      ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="2"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-compose than 2.7.0 is available: 2.10.0"
+        errorLine1="    implementation(&quot;androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="85"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.lifecycle:lifecycle-runtime-compose than 2.7.0 is available: 2.10.0"
+        errorLine1="    implementation(&quot;androidx.lifecycle:lifecycle-runtime-compose:2.7.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="86"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.hilt:hilt-navigation-compose than 1.1.0 is available: 1.3.0"
+        errorLine1="    implementation(&quot;androidx.hilt:hilt-navigation-compose:1.1.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="91"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.hilt:hilt-work than 1.1.0 is available: 1.3.0"
+        errorLine1="    implementation(&quot;androidx.hilt:hilt-work:1.1.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="92"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.hilt:hilt-compiler than 1.1.0 is available: 1.3.0"
+        errorLine1="    kapt(&quot;androidx.hilt:hilt-compiler:1.1.0&quot;)"
+        errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="93"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.room:room-runtime than 2.6.1 is available: 2.8.4"
+        errorLine1="    implementation(&quot;androidx.room:room-runtime:2.6.1&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="96"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.room:room-ktx than 2.6.1 is available: 2.8.4"
+        errorLine1="    implementation(&quot;androidx.room:room-ktx:2.6.1&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="97"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.room:room-compiler than 2.6.1 is available: 2.8.4"
+        errorLine1="    kapt(&quot;androidx.room:room-compiler:2.6.1&quot;)"
+        errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="98"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.work:work-runtime-ktx than 2.9.0 is available: 2.11.2"
+        errorLine1="    implementation(&quot;androidx.work:work-runtime-ktx:2.9.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="107"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.google.firebase:firebase-bom than 34.12.0 is available: 34.13.0"
+        errorLine1="    implementation(platform(&quot;com.google.firebase:firebase-bom:34.12.0&quot;))"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="114"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.google.android.gms:play-services-auth than 21.2.0 is available: 21.5.1"
+        errorLine1="    implementation(&quot;com.google.android.gms:play-services-auth:21.2.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="121"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.18.0"
+        errorLine1="coreKtx = &quot;1.17.0&quot;"
+        errorLine2="          ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="4"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.activity:activity-compose than 1.12.4 is available: 1.13.0"
+        errorLine1="activityCompose = &quot;1.12.4&quot;"
+        errorLine2="                  ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="9"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.compose:compose-bom than 2024.09.00 is available: 2026.05.01"
+        errorLine1="composeBom = &quot;2024.09.00&quot;"
+        errorLine2="             ~~~~~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="10"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.room:room-compiler than 2.6.1 is available: 2.8.4"
+        errorLine1="room = &quot;2.6.1&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="12"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.room:room-ktx than 2.6.1 is available: 2.8.4"
+        errorLine1="room = &quot;2.6.1&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="12"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.room:room-runtime than 2.6.1 is available: 2.8.4"
+        errorLine1="room = &quot;2.6.1&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="12"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.work:work-runtime-ktx than 2.9.0 is available: 2.11.2"
+        errorLine1="workManager = &quot;2.9.0&quot;"
+        errorLine2="              ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="15"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.hilt:hilt-navigation-compose than 1.1.0 is available: 1.3.0"
+        errorLine1="hiltNavigationCompose = &quot;1.1.0&quot;"
+        errorLine2="                        ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="16"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.hilt:hilt-work than 1.1.0 is available: 1.3.0"
+        errorLine1="hiltWork = &quot;1.1.0&quot;"
+        errorLine2="           ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="17"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.navigation:navigation-compose than 2.9.7 is available: 2.9.8"
+        errorLine1="navigationCompose = &quot;2.9.7&quot;"
+        errorLine2="                    ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="18"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.compose.animation:animation-core than 1.10.6 is available: 1.11.2"
+        errorLine1="animationCore = &quot;1.10.6&quot;"
+        errorLine2="                ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="19"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.google.gms.google-services than 4.4.2 is available: 4.4.4"
+        errorLine1="google-services = { id = &quot;com.google.gms.google-services&quot;, version = &quot;4.4.2&quot; }"
+        errorLine2="                                                                     ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="56"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.google.dagger:hilt-android than 2.50 is available: 2.59.2"
+        errorLine1="    implementation(&quot;com.google.dagger:hilt-android:2.50&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="89"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.google.dagger:hilt-compiler than 2.50 is available: 2.59.2"
+        errorLine1="    kapt(&quot;com.google.dagger:hilt-compiler:2.50&quot;)"
+        errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="90"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.squareup.retrofit2:retrofit than 2.9.0 is available: 3.0.0"
+        errorLine1="    implementation(&quot;com.squareup.retrofit2:retrofit:2.9.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="101"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.squareup.retrofit2:converter-gson than 2.9.0 is available: 3.0.0"
+        errorLine1="    implementation(&quot;com.squareup.retrofit2:converter-gson:2.9.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="102"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.squareup.okhttp3:okhttp than 4.12.0 is available: 5.3.2"
+        errorLine1="    implementation(&quot;com.squareup.okhttp3:okhttp:4.12.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="103"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.squareup.okhttp3:logging-interceptor than 4.12.0 is available: 5.3.2"
+        errorLine1="    implementation(&quot;com.squareup.okhttp3:logging-interceptor:4.12.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="104"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.7.3 is available: 1.11.0"
+        errorLine1="    implementation(&quot;org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="110"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-play-services than 1.8.0 is available: 1.11.0"
+        errorLine1="    implementation(&quot;org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="111"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlin.android than 2.0.21 is available: 2.3.21"
+        errorLine1="kotlin = &quot;2.0.21&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="3"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlin.kapt than 2.0.21 is available: 2.3.21"
+        errorLine1="kotlin = &quot;2.0.21&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="3"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlin.plugin.compose than 2.0.21 is available: 2.3.21"
+        errorLine1="kotlin = &quot;2.0.21&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="3"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.google.dagger.hilt.android than 2.50 is available: 2.59.2"
+        errorLine1="hilt = &quot;2.50&quot;"
+        errorLine2="       ~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="11"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.google.dagger:hilt-android than 2.50 is available: 2.59.2"
+        errorLine1="hilt = &quot;2.50&quot;"
+        errorLine2="       ~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="11"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.google.dagger:hilt-compiler than 2.50 is available: 2.59.2"
+        errorLine1="hilt = &quot;2.50&quot;"
+        errorLine2="       ~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="11"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.squareup.retrofit2:converter-gson than 2.9.0 is available: 3.0.0"
+        errorLine1="retrofit = &quot;2.9.0&quot;"
+        errorLine2="           ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="13"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of com.squareup.retrofit2:retrofit than 2.9.0 is available: 3.0.0"
+        errorLine1="retrofit = &quot;2.9.0&quot;"
+        errorLine2="           ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="13"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.7.3 is available: 1.11.0"
+        errorLine1="coroutines = &quot;1.7.3&quot;"
+        errorLine2="             ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/RecallAI/gradle/libs.versions.toml"
+            line="14"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="ModifierParameter"
+        message="Modifier parameter should be the first optional parameter"
+        errorLine1="    modifier:      Modifier = Modifier"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/ui/meetingdetail/ShimmerBox.kt"
+            line="55"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierParameter"
+        message="Modifier parameter should be the first optional parameter"
+        errorLine1="    modifier:  Modifier = Modifier"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/ui/meetingdetail/ShimmerBox.kt"
+            line="91"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Use of this function is discouraged because resource reflection makes it harder to perform build optimizations and compile-time verification of code. It is much more efficient to retrieve resources by identifier (e.g. `R.foo.bar`) than by name (e.g. `getIdentifier(&quot;bar&quot;, &quot;foo&quot;, null)`)."
+        errorLine1="            context.resources.getIdentifier("
+        errorLine2="                              ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/Auth/Authrepository.kt"
+            line="69"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="KaptUsageInsteadOfKsp"
+        message="This library supports using KSP instead of kapt, which greatly improves performance. Learn more: https://developer.android.com/studio/build/migrate-to-ksp"
+        errorLine1="    kapt(&quot;androidx.room:room-compiler:2.6.1&quot;)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="98"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.purple_200` appears to be unused"
+        errorLine1="    &lt;color name=&quot;purple_200&quot;>#FFBB86FC&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="3"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.purple_500` appears to be unused"
+        errorLine1="    &lt;color name=&quot;purple_500&quot;>#FF6200EE&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="4"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.purple_700` appears to be unused"
+        errorLine1="    &lt;color name=&quot;purple_700&quot;>#FF3700B3&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="5"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.teal_200` appears to be unused"
+        errorLine1="    &lt;color name=&quot;teal_200&quot;>#FF03DAC5&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="6"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.teal_700` appears to be unused"
+        errorLine1="    &lt;color name=&quot;teal_700&quot;>#FF018786&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="7"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.black` appears to be unused"
+        errorLine1="    &lt;color name=&quot;black&quot;>#FF000000&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="8"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_app_icon` appears to be unused">
+        <location
+            file="src/main/res/drawable/ic_app_icon.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_launcher_background` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_launcher_background.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.ic_launcher_background` appears to be unused"
+        errorLine1="    &lt;color name=&quot;ic_launcher_background&quot;>#E7EDF9&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/ic_launcher_background.xml"
+            line="3"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_launcher_foreground` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_launcher_foreground.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_launcher_playstore` appears to be unused">
+        <location
+            file="src/main/res/drawable/ic_launcher_playstore.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.recallicon` appears to be unused">
+        <location
+            file="src/main/res/drawable/recallicon.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.mipmap.recallicon` appears to be unused">
+        <location
+            file="src/main/res/mipmap-mdpi/recallicon.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-hdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-mdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-xhdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-xxhdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-xxxhdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable/ic_launcher_playstore.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icon used as round icon did not have a circular shape">
+        <location
+            file="src/main/res/mipmap-hdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icon used as round icon did not have a circular shape">
+        <location
+            file="src/main/res/mipmap-mdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icon used as round icon did not have a circular shape">
+        <location
+            file="src/main/res/mipmap-xhdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icon used as round icon did not have a circular shape">
+        <location
+            file="src/main/res/mipmap-xxhdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icon used as round icon did not have a circular shape">
+        <location
+            file="src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="MonochromeLauncherIcon"
+        message="The application adaptive icon is missing a monochrome tag"
+        errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="MonochromeLauncherIcon"
+        message="The application adaptive roundIcon is missing a monochrome tag"
+        errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="IconDipSize"
+        message="The image `ic_launcher.png` varies significantly in its density-independent (dip) size across the various density versions: mipmap-hdpi/ic_launcher.png: 341x341 dp (512x512 px), mipmap-mdpi/ic_launcher.png: 512x512 dp (512x512 px), mipmap-xhdpi/ic_launcher.png: 256x256 dp (512x512 px), mipmap-xxhdpi/ic_launcher.png: 171x171 dp (512x512 px), mipmap-xxxhdpi/ic_launcher.png: 128x128 dp (512x512 px)">
+        <location
+            file="src/main/res/mipmap-xxxhdpi/ic_launcher.png"/>
+        <location
+            file="src/main/res/mipmap-xxhdpi/ic_launcher.png"/>
+        <location
+            file="src/main/res/mipmap-xhdpi/ic_launcher.png"/>
+        <location
+            file="src/main/res/mipmap-hdpi/ic_launcher.png"/>
+        <location
+            file="src/main/res/mipmap-mdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconDipSize"
+        message="The image `ic_launcher_round.png` varies significantly in its density-independent (dip) size across the various density versions: mipmap-hdpi/ic_launcher_round.png: 341x341 dp (512x512 px), mipmap-mdpi/ic_launcher_round.png: 512x512 dp (512x512 px), mipmap-xhdpi/ic_launcher_round.png: 256x256 dp (512x512 px), mipmap-xxhdpi/ic_launcher_round.png: 171x171 dp (512x512 px), mipmap-xxxhdpi/ic_launcher_round.png: 128x128 dp (512x512 px)">
+        <location
+            file="src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"/>
+        <location
+            file="src/main/res/mipmap-xxhdpi/ic_launcher_round.png"/>
+        <location
+            file="src/main/res/mipmap-xhdpi/ic_launcher_round.png"/>
+        <location
+            file="src/main/res/mipmap-hdpi/ic_launcher_round.png"/>
+        <location
+            file="src/main/res/mipmap-mdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `recallicon.png` icon has identical contents in the following configuration folders: drawable, mipmap-mdpi">
+        <location
+            file="src/main/res/mipmap-mdpi/recallicon.png"/>
+        <location
+            file="src/main/res/drawable/recallicon.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/ic_app_icon.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/ic_app_icon.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/ic_launcher_playstore.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/ic_launcher_playstore.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/recallicon.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/recallicon.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicates"
+        message="The following unrelated icon files have identical contents: ic_launcher_playstore.png, ic_launcher.png, ic_launcher_round.png, ic_launcher.png, ic_launcher_round.png, ic_launcher.png, ic_launcher_round.png, ic_launcher.png, ic_launcher_round.png, ic_launcher.png, ic_launcher_round.png">
+        <location
+            file="src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"/>
+        <location
+            file="src/main/res/mipmap-xxxhdpi/ic_launcher.png"/>
+        <location
+            file="src/main/res/mipmap-xxhdpi/ic_launcher_round.png"/>
+        <location
+            file="src/main/res/mipmap-xxhdpi/ic_launcher.png"/>
+        <location
+            file="src/main/res/mipmap-xhdpi/ic_launcher_round.png"/>
+        <location
+            file="src/main/res/mipmap-xhdpi/ic_launcher.png"/>
+        <location
+            file="src/main/res/mipmap-mdpi/ic_launcher_round.png"/>
+        <location
+            file="src/main/res/mipmap-mdpi/ic_launcher.png"/>
+        <location
+            file="src/main/res/mipmap-hdpi/ic_launcher_round.png"/>
+        <location
+            file="src/main/res/mipmap-hdpi/ic_launcher.png"/>
+        <location
+            file="src/main/res/drawable/ic_launcher_playstore.png"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        errorLine1="        Color(android.graphics.Color.parseColor(hex))"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/ui/dashbord/ActionItemsScreen.kt"
+            line="393"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        errorLine1="    return try { Color(android.graphics.Color.parseColor(hex)) } catch (_: Exception) { Color(0xFFE8EAF0) }"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/ui/dashbord/AllRecallsScreen.kt"
+            line="282"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        errorLine1="        Color(android.graphics.Color.parseColor(hex))"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/ui/dashbord/DashboardScreen.kt"
+            line="156"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(&quot;androidx.compose.material:material-icons-extended&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="79"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(&quot;androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="85"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(&quot;androidx.lifecycle:lifecycle-runtime-compose:2.7.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="86"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.hilt.android`) instead"
+        errorLine1="    implementation(&quot;com.google.dagger:hilt-android:2.50&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="89"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.hilt.compiler`) instead"
+        errorLine1="    kapt(&quot;com.google.dagger:hilt-compiler:2.50&quot;)"
+        errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="90"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.androidx.hilt.navigation.compose`) instead"
+        errorLine1="    implementation(&quot;androidx.hilt:hilt-navigation-compose:1.1.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="91"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.androidx.hilt.work`) instead"
+        errorLine1="    implementation(&quot;androidx.hilt:hilt-work:1.1.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="92"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    kapt(&quot;androidx.hilt:hilt-compiler:1.1.0&quot;)"
+        errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="93"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.room.runtime`) instead"
+        errorLine1="    implementation(&quot;androidx.room:room-runtime:2.6.1&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="96"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.room.ktx`) instead"
+        errorLine1="    implementation(&quot;androidx.room:room-ktx:2.6.1&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="97"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.room.compiler`) instead"
+        errorLine1="    kapt(&quot;androidx.room:room-compiler:2.6.1&quot;)"
+        errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="98"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.retrofit`) instead"
+        errorLine1="    implementation(&quot;com.squareup.retrofit2:retrofit:2.9.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="101"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.retrofit.gson`) instead"
+        errorLine1="    implementation(&quot;com.squareup.retrofit2:converter-gson:2.9.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="102"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(&quot;com.squareup.okhttp3:okhttp:4.12.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="103"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(&quot;com.squareup.okhttp3:logging-interceptor:4.12.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="104"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.work.runtime.ktx`) instead"
+        errorLine1="    implementation(&quot;androidx.work:work-runtime-ktx:2.9.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="107"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use the existing version catalog reference (`libs.coroutines.android`) instead"
+        errorLine1="    implementation(&quot;org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="110"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(&quot;org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="111"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(platform(&quot;com.google.firebase:firebase-bom:34.12.0&quot;))"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="114"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(&quot;com.google.firebase:firebase-ai&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="115"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(&quot;com.google.firebase:firebase-auth&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="116"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(&quot;com.google.firebase:firebase-appcheck-playintegrity&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="117"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    debugImplementation(&quot;com.google.firebase:firebase-appcheck-debug&quot;)"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="118"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="UseTomlInstead"
+        message="Use version catalog instead"
+        errorLine1="    implementation(&quot;com.google.android.gms:play-services-auth:21.2.0&quot;)"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="121"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="ConstantLocale"
+        message="Assigning `Locale.getDefault()` to a final static field is suspicious; this code will not work correctly if the user changes locale while the app is running"
+        errorLine1="private val dateFormatFull = java.text.SimpleDateFormat(&quot;MMM d, yyyy • HH:mm&quot;, java.util.Locale.getDefault())"
+        errorLine2="                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/ui/dashbord/AllRecallsScreen.kt"
+            line="307"
+            column="80"/>
+    </issue>
+
+    <issue
+        id="ConstantLocale"
+        message="Assigning `Locale.getDefault()` to a final static field is suspicious; this code will not work correctly if the user changes locale while the app is running"
+        errorLine1="private val dateFormat = SimpleDateFormat(&quot;MMM d&quot;, Locale.getDefault())"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mohit/recall_ai/ui/dashbord/DashboardScreen.kt"
+            line="1066"
+            column="52"/>
+    </issue>
+
+</issues>
