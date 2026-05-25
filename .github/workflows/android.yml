@@ -1,0 +1,68 @@
+name: Android CI/CD
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "stable1.0", "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Inject API keys into local.properties
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> local.properties
+          echo "OPENAI_API_KEY=" >> local.properties
+
+      - name: Inject google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: printf '%s' "${GOOGLE_SERVICES_JSON}" > app/google-services.json
+
+      - name: Run unit tests
+        run: ./gradlew test
+
+      - name: Run Android Lint
+        run: ./gradlew lint
+
+      - name: Upload Lint Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.html
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload to Firebase App Distribution
+        if: github.ref == 'refs/heads/stable1.0'
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: testers
+          file: app/build/outputs/apk/debug/app-debug.apk

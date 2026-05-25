@@ -17,13 +17,13 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.recall_ai"
+    namespace = "com.mohit.recall_ai"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.recall_ai"
+        applicationId = "com.mohit.recall_ai"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -42,7 +42,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -80,6 +81,15 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.12.0")) // Use the latest version
+
+// Firebase AI SDK (replaces direct Gemini REST calls for transcription/summary/chat)
+    implementation("com.google.firebase:firebase-ai")
+// App Check (Play Integrity for release, Debug provider for dev)
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    debugImplementation("com.google.firebase:firebase-appcheck-debug")
 
     // You already have this BoM line:
     implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
@@ -143,5 +153,11 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     kapt("androidx.hilt:hilt-compiler:1.1.0")
+
+    // App Check - Play Integrity (for production)
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+
+    // App Check - Debug provider (for development/emulator)
+    debugImplementation("com.google.firebase:firebase-appcheck-debug")
 
 }

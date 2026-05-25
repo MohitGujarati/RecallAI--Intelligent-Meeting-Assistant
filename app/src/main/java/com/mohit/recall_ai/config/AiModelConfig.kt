@@ -1,0 +1,38 @@
+package com.mohit.recall_ai.config
+
+/**
+ * Centralized configuration for AI Model identifiers used across the app.
+ * Change these values to update the models used by the Gemini and Whisper services.
+ */
+object AiModelConfig {
+    /** Model used for transcribing audio chunks (e.g., gemini-1.5-flash) */
+    const val GEMINI_TRANSCRIPTION_MODEL = "gemini-3-flash-preview"
+
+    /** Model used for generating the final meeting summary */
+    const val GEMINI_SUMMARY_MODEL       = "gemini-3-flash-preview"
+
+    /** Model used for the Q&A chat feature against the transcript */
+    const val GEMINI_CHAT_MODEL          = "gemini-3-flash-preview"
+
+    /** Model used for real-time bidirectional audio-to-audio interactions */
+    const val GEMINI_LIVE_MODEL          = "gemini-3.1-flash-live-preview"
+
+
+    /** Model used when Whisper fallback is enabled */
+    const val WHISPER_MODEL              = "whisper-1"
+
+    /** Base URL for all Gemini model endpoints */
+    const val GEMINI_BASE_URL            = "https://generativelanguage.googleapis.com/v1beta/models"
+
+    /** Base URL for Gemini Live WebSocket endpoint (v1beta for API key auth) */
+    const val GEMINI_LIVE_BASE_URL       = "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent"
+
+    /** Base URL for Whisper transcription endpoints */
+    const val WHISPER_BASE_URL           = "https://api.openai.com/"
+
+
+    val OPENAI_API_KEY = ""
+    // GEMINI_API_KEY removed — transcription/summary/chat now use Firebase AI SDK (App Check).
+    // GeminiLiveClient (Bob) still reads the key via @Named("gemini_api_key") in NetworkModule.
+}
+
